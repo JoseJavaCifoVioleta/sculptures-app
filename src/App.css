@@ -161,6 +161,7 @@ main {
   font-size: 0.95rem;
   font-weight: 600;
   text-decoration: none;
+  cursor: pointer;
   transition:
     transform 0.2s ease,
     box-shadow 0.2s ease,
@@ -169,6 +170,7 @@ main {
 }
 
 .button-primary {
+  border: 0;
   background: var(--gradient);
   color: #ffffff;
   box-shadow: 0 16px 30px -16px rgba(124, 58, 237, 0.9);
@@ -393,6 +395,80 @@ main {
   margin-top: 28px;
 }
 
+.sculpture-form {
+  margin-top: 36px;
+  padding: clamp(22px, 4vw, 36px);
+  border: 1px solid var(--border);
+  border-radius: 26px;
+  background: var(--surface);
+  box-shadow: var(--shadow-soft);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.form-field-wide {
+  grid-column: 1 / -1;
+}
+
+.form-label {
+  font-family: var(--heading);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--text-h);
+}
+
+.form-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--bg);
+  color: var(--text-h);
+  font-family: var(--sans);
+  font-size: 0.95rem;
+  line-height: 1.4;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.form-input:hover {
+  border-color: var(--accent-border);
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: var(--surface);
+  box-shadow: 0 0 0 4px var(--accent-bg);
+}
+
+.form-textarea {
+  min-height: 150px;
+  resize: vertical;
+  line-height: 1.55;
+}
+
+.form-actions {
+  margin-top: 28px;
+  padding-top: 22px;
+  border-top: 1px solid var(--border);
+}
+
 .footer {
   display: flex;
   flex-wrap: wrap;
@@ -438,6 +514,10 @@ main {
   .detail-layout {
     grid-template-columns: 1fr;
   }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 640px) {
@@ -465,7 +545,8 @@ main {
   .button-ghost,
   .nav-links a,
   .sculpture-card,
-  .sculpture-media img {
+  .sculpture-media img,
+  .form-input {
     transition: none;
   }
 

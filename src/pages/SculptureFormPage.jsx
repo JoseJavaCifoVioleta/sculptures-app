@@ -193,20 +193,20 @@ function SculptureForm({ id }) {
               onChange={handleChange}
             />
           </div>
-        </div>
 
-        <div className="form-field form-field-wide">
-          <label className="form-label" htmlFor="description">
-            Description
-          </label>
-          <textarea
-            className="form-input form-textarea"
-            id="description"
-            name="description"
-            rows="6"
-            value={form.description}
-            onChange={handleChange}
-          />
+          <div className="form-field form-field-wide">
+            <label className="form-label" htmlFor="description">
+              Description
+            </label>
+            <textarea
+              className="form-input form-textarea"
+              id="description"
+              name="description"
+              rows="6"
+              value={form.description}
+              onChange={handleChange}
+            />
+          </div>
         </div>
 
         <div className="page-actions form-actions">

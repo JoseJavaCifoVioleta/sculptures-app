@@ -208,10 +208,51 @@ npm run build
 
 Los dos pasan. Los scripts de prueba eran temporales y los borré antes de terminar.
 
+## Pase de estilos (commit aparte)
+
+Con la funcionalidad ya commiteada, hice el pase visual del formulario **sin tocar la lógica**:
+solo `App.css` y un cambio de estructura en el JSX para que la descripción quepa dentro de la
+misma rejilla.
+
+### Qué cambié
+
+- **`.sculpture-form`**: el formulario va dentro de una tarjeta con borde, esquinas
+  redondeadas, fondo `--surface` y `--shadow-soft`. Así deja de parecer un formulario suelto
+  debajo del título.
+- **`.form-grid`**: dos columnas con `repeat(2, minmax(0, 1fr))`. El `minmax(0, ...)` evita que
+  un texto largo ensanche una columna, igual que en el detalle de la parte 5.
+- **Descripción a todo el ancho**: moví el `<textarea>` dentro de `.form-grid` y le puse
+  `.form-field-wide` con `grid-column: 1 / -1`. Antes estaba fuera de la rejilla y quedaba
+  descolgado.
+- **`.form-label`**: tipografía de títulos, tamaño pequeño y un poco de espaciado entre letras.
+- **`.form-input`**: ancho completo, padding cómodo, borde suave, fondo `--bg` y esquinas de
+  14 px. El texto usa la fuente normal y el color de título.
+- **Foco visible**: al entrar en un campo, el borde se vuelve `--accent` y aparece un halo con
+  `--accent-bg`. Es importante para navegar con el teclado y no depender solo del ratón.
+- **`.form-textarea`**: altura mínima de 150 px y `resize: vertical`, para poder ampliarla sin
+  romper el ancho.
+- **`.form-actions`**: línea superior y margen antes de los botones, para separar el envío de
+  los campos.
+- **Botones**: el `<button>` nativo conservaba el borde del navegador. Le puse `border: 0` al
+  botón primario y `cursor: pointer` a los dos, que como enlaces ya lo tenían pero como botón
+  no.
+
+Todo sale de las variables de `index.css`, así que el modo oscuro funciona sin reglas extra.
+El punto de ruptura de `760px` pasa la rejilla a una columna.
+
+### Verificación
+
+- `npm run lint` y `npm run build` pasan.
+- Capturas con Chrome headless: crear y editar a 1280 px, modo oscuro y ancho estrecho de
+  504 px. No hay desbordamientos y los campos se apilan correctamente.
+- Repetí la prueba de interacción con Chrome y DevTools después de mover el textarea:
+  - editar una escultura mantiene las 12 tarjetas y muestra el nombre nuevo;
+  - crear una escultura deja 13 tarjetas y aparece en la lista.
+- Las capturas son temporales; si guardo alguna en `docs/`, la enlazaré aquí.
+
 ## Qué dejo para después
 
 - **Parte 7**: botón de borrar en la lista y, como bonus, en el detalle.
-- **Pase de estilos**: rejilla del formulario, inputs, foco, textarea y botones.
 - **Bonus pendientes**: validación de campos obligatorios con mensajes, confirmación al borrar,
   filtros y persistencia.
 
