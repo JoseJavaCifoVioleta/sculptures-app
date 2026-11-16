@@ -9,7 +9,7 @@ un CRUD completo (Create, Read, Update, Delete) con navegación superior mediant
 
 - **React 19** con componentes funcionales y hooks.
 - **Vite 8** como bundler y servidor de desarrollo.
-- **react-router-dom 7** para las rutas (instalado, aún sin usar).
+- **react-router-dom 7** para las rutas.
 - **ESLint 10** (flat config) para el análisis estático.
 - JavaScript (sin TypeScript), tal como propone el enunciado.
 
@@ -39,9 +39,10 @@ sculptures-app/
 │   └── ...                # enunciado y capturas del proceso
 ├── public/                # favicon e iconos estáticos
 ├── src/
-│   ├── assets/            # imágenes del template de Vite
-│   ├── App.jsx            # (pendiente) rutas y estado compartido
-│   ├── App.css            # (pendiente) estilos de la aplicación
+│   ├── assets/            # imágenes del template de Vite (sin usar)
+│   ├── pages/             # Layout, listado, detalle, formulario y 404
+│   ├── App.jsx            # router, estado y handlers CRUD
+│   ├── App.css            # estilos de la barra y del contenido
 │   ├── index.css          # estilos globales y variables de tema
 │   ├── data.js            # dataset de esculturas (parte 2)
 │   └── main.jsx           # punto de entrada
@@ -57,7 +58,7 @@ sculptures-app/
 | 1     | Scaffold del proyecto con Vite                | ✅     | [Parte 1](docs/bitacora/parte-01-scaffold.md)               |
 | 2     | Preparar los datos (`src/data.js`)            | ✅     | [Parte 2](docs/bitacora/parte-02-datos.md)                  |
 | 3     | Pensar el diseño antes de codificar           | ✅     | [Parte 3](docs/bitacora/parte-03-diseno.md)                 |
-| 4     | Rutas y barra de navegación                   | ⏳     | —                                                           |
+| 4     | Rutas y barra de navegación                   | ✅     | [Parte 4](docs/bitacora/parte-04-rutas-nav.md)              |
 | 5     | Read: listado y detalle                       | ⏳     | —                                                           |
 | 6     | Create + Update con un formulario compartido  | ⏳     | —                                                           |
 | 7     | Delete                                        | ⏳     | —                                                           |
@@ -71,11 +72,12 @@ los cambios realizados:
 - [Parte 1 — Crear el proyecto con Vite](docs/bitacora/parte-01-scaffold.md)
 - [Parte 2 — Preparar los datos](docs/bitacora/parte-02-datos.md)
 - [Parte 3 — Pensar el diseño antes de codificar](docs/bitacora/parte-03-diseno.md)
+- [Parte 4 — Rutas y barra de navegación](docs/bitacora/parte-04-rutas-nav.md)
 
 ## Próximos pasos
 
-- **Parte 4**: crear `Layout` y las rutas anidadas.
 - **Parte 5**: listado y detalle de esculturas.
+- **Parte 6**: formulario compartido para crear y editar.
 
 ## Créditos
 
