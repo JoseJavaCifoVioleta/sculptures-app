@@ -319,7 +319,12 @@ componente nuevo.
   - detalle de la escultura 1 (con `location`) y de la 2 (sin `location`);
   - `/sculptures/999` con el estado “not found”;
   - listado y detalle a 504 px.
-- Las capturas son temporales y no se suben al repositorio.
+- Las capturas de verificación son temporales; las de la apariencia final sí las guardo en
+  `docs/`.
+
+Así queda el listado en escritorio y en ancho estrecho:
+
+![Listado de la parte 5 en escritorio y móvil](../parte5_cambio_apariencia.jpg)
 
 ## Microanimaciones: entrada escalonada de las tarjetas
 
@@ -397,7 +402,7 @@ Información de la propiedad:
   tercera apenas se intuye. Captura a 3 s: las doce están visibles y colocadas.
 - Probé también con `--force-prefers-reduced-motion`: las tarjetas aparecen completas desde el
   primer momento, sin animación.
-- Las capturas son temporales y no se suben al repositorio.
+- Las capturas de la animación son temporales y no se suben al repositorio.
 
 ## Fuentes
 
