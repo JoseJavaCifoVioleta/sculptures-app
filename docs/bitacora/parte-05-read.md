@@ -326,6 +326,10 @@ Así queda el listado en escritorio y en ancho estrecho:
 
 ![Listado de la parte 5 en escritorio y móvil](../parte5_cambio_apariencia.jpg)
 
+Y así el detalle de una obra:
+
+![Detalle de la parte 5 en escritorio y móvil](../parte5_cambio_apariencia_detalle_obra.jpg)
+
 ## Microanimaciones: entrada escalonada de las tarjetas
 
 Como último toque, añadí una animación de entrada para que las tarjetas no aparezcan de golpe.
