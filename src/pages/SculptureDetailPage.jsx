@@ -13,14 +13,19 @@ export default function SculptureDetailPage() {
       <section className="page">
         <p className="eyebrow">Not found</p>
         <h1 className="page-title">Sculpture not found</h1>
-        <p className="page-lead">
-          There is no sculpture with id {id} in the catalogue.
-        </p>
+        <div className="empty-card">
+          <span className="empty-icon" aria-hidden="true">
+            🗿
+          </span>
+          <p className="page-lead">
+            There is no sculpture with id {id} in the catalogue.
+          </p>
 
-        <div className="page-actions">
-          <Link className="button-ghost" to="/">
-            Back to list
-          </Link>
+          <div className="page-actions">
+            <Link className="button-ghost" to="/">
+              Back to list
+            </Link>
+          </div>
         </div>
       </section>
     )
@@ -55,13 +60,13 @@ export default function SculptureDetailPage() {
               </div>
             )}
           </dl>
-        </div>
-      </div>
 
-      <div className="page-actions">
-        <Link className="button-ghost" to="/">
-          Back to list
-        </Link>
+          <div className="page-actions detail-actions">
+            <Link className="button-ghost" to="/">
+              Back to list
+            </Link>
+          </div>
+        </div>
       </div>
     </section>
   )

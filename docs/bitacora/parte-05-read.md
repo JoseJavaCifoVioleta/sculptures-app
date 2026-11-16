@@ -255,13 +255,71 @@ npm run build
 El script era temporal, así que lo borré antes de commitear. La revisión visual (modo oscuro y
 ancho estrecho) la dejé para el pase de estilos, que es donde toca.
 
-## Lo que queda para el pase de estilos
+## Pase de estilos (commit aparte)
 
-- Rejilla de tarjetas para el listado, con miniatura, cuerpo y acciones.
-- Distribución del detalle en dos columnas (imagen + datos), con apilado en pantallas
-  estrechas.
-- Presentación del año como distintivo y de los metadatos como bloques.
-- Ajuste del estado “not found” para que no parezca un texto suelto.
+Con la funcionalidad cerrada y el commit hecho, me permití el rato de estética. Todo el cambio
+está en `App.css` y en un pequeño ajuste de JSX del detalle; no toqué rutas, estado ni handlers.
+
+### Listado
+
+- **`.sculpture-grid`**: rejilla responsive con
+  `grid-template-columns: repeat(auto-fill, minmax(260px, 1fr))`. Mi primer intento fue fijar
+  tres columnas (`repeat(3, 1fr)`), pero al estrechar la ventana las tarjetas se aplastaban y
+  el texto se partía mal. Con `auto-fill` y un mínimo de 260 px, el navegador decide solo
+  cuántas caben y pasa a una columna en pantallas estrechas.
+- **`.sculpture-card`**: fondo `--surface`, borde, esquinas redondeadas y `--shadow-soft`. Al
+  pasar el ratón se eleva 4 px y cambia el borde al color de acento.
+- **`.sculpture-media`**: relación de aspecto `4 / 3` y `object-fit: cover`, para que todas las
+  miniaturas tengan la misma altura aunque las fotos originales sean distintas. Con
+  `overflow: hidden` y un `scale(1.04)` al hacer hover, la imagen se acerca sin mover la
+  tarjeta. `aspect-ratio` está documentado en MDN:
+  https://developer.mozilla.org/en-US/docs/Web/CSS/aspect-ratio
+- **`.sculpture-year`**: el año como distintivo en forma de píldora con `--accent-bg` y
+  `--accent`. Así destaca sin competir con el nombre.
+- **`.sculpture-actions`**: `margin-top: auto` empuja los botones al fondo de la tarjeta, de
+  forma que todas las filas quedan alineadas aunque un nombre ocupe dos líneas.
+- Los botones View/Edit se quedan pequeños (`padding: 8px 16px`) para que la tarjeta no parezca
+  un panel de administración.
+
+### Detalle
+
+- **`.detail-layout`**: dos columnas con `minmax(0, 1.05fr)` y `minmax(0, 0.95fr)`. El
+  `minmax(0, ...)` evita que un texto largo ensanche la columna y rompa la rejilla; es un truco
+  que ya había visto en el CSS del template de Vite.
+- **`.detail-media`**: la imagen va en una tarjeta con borde y sombra, redondeada, para que no
+  quede pegada al texto.
+- **`.detail-meta`**: los datos en una rejilla `auto-fit` con un bloque por campo; la etiqueta
+  (`<dt>`) en mayúsculas pequeñas y el valor (`<dd>`) con la tipografía de títulos.
+- **Ajuste de composición**: en la primera versión el botón “Back to list” estaba fuera del
+  `detail-layout`, al final de la página. En escritorio aparecía debajo de la imagen, lejos de
+  los metadatos, y parecía pertenecer a la foto. Lo moví dentro de `.detail-body`, después de
+  la lista de datos, con la clase `.detail-actions` para darle margen superior.
+
+### Estado “no encontrada”
+
+En vez de dejar el texto suelto, reutilicé `.empty-card` y `.empty-icon` de la parte 4, con el
+emoji 🗿 y el botón centrado (`.empty-card .page-actions`). No hizo falta inventar un
+componente nuevo.
+
+### Responsive y modo oscuro
+
+- Añadí un punto de ruptura a `760px`: la rejilla del listado y las dos columnas del detalle
+  pasan a una sola columna.
+- Revisé el resultado a 504 px, que es el ancho mínimo que me da Chrome headless (el mismo
+  detalle que apunté en la parte 4).
+- En modo oscuro todo funciona porque los colores salen de las variables de `index.css`. El
+  único valor fijo es la sombra del hover, que ya estaba pensada para el fondo claro; en oscuro
+  se ve discreta y no la cambié.
+
+### Verificación
+
+- `npm run lint` y `npm run build` pasan.
+- Capturas con Chrome headless:
+  - listado a 1280 px, modo claro y modo oscuro;
+  - detalle de la escultura 1 (con `location`) y de la 2 (sin `location`);
+  - `/sculptures/999` con el estado “not found”;
+  - listado y detalle a 504 px.
+- Las capturas son temporales y no se suben al repositorio.
 
 ## Fuentes
 
@@ -271,3 +329,4 @@ ancho estrecho) la dejé para el pase de estilos, que es donde toca.
 - `useOutletContext`: https://reactrouter.com/api/hooks/useOutletContext
 - `loading` de las imágenes: https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/img#loading
 - Listas de definiciones: https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/dl
+- `aspect-ratio`: https://developer.mozilla.org/en-US/docs/Web/CSS/aspect-ratio
