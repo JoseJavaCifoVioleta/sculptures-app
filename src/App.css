@@ -222,6 +222,21 @@ main {
   color: var(--text);
 }
 
+.button-danger {
+  border-color: var(--danger-border);
+  color: var(--danger);
+}
+
+.button-danger:hover {
+  border-color: var(--danger);
+  background: var(--danger-bg);
+  color: var(--danger);
+}
+
+.button-danger:focus-visible {
+  outline-color: var(--danger);
+}
+
 .empty-card .page-actions {
   justify-content: center;
 }
