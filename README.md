@@ -59,7 +59,7 @@ sculptures-app/
 | 2     | Preparar los datos (`src/data.js`)            | ✅     | [Parte 2](docs/bitacora/parte-02-datos.md)                  |
 | 3     | Pensar el diseño antes de codificar           | ✅     | [Parte 3](docs/bitacora/parte-03-diseno.md)                 |
 | 4     | Rutas, navegación y estética                  | ✅     | [Parte 4](docs/bitacora/parte-04-rutas-nav.md)              |
-| 5     | Read: listado y detalle                       | ⏳     | —                                                           |
+| 5     | Read: listado y detalle                       | ✅     | [Parte 5](docs/bitacora/parte-05-read.md)                   |
 | 6     | Create + Update con un formulario compartido  | ⏳     | —                                                           |
 | 7     | Delete                                        | ⏳     | —                                                           |
 | Bonus | Confirmación, validación, filtros, etc.       | ⏳     | —                                                           |
@@ -73,11 +73,12 @@ los cambios realizados:
 - [Parte 2 — Preparar los datos](docs/bitacora/parte-02-datos.md)
 - [Parte 3 — Pensar el diseño antes de codificar](docs/bitacora/parte-03-diseno.md)
 - [Parte 4 — Rutas, navegación y estética](docs/bitacora/parte-04-rutas-nav.md)
+- [Parte 5 — Read: listado y detalle](docs/bitacora/parte-05-read.md)
 
 ## Próximos pasos
 
-- **Parte 5**: listado y detalle de esculturas.
 - **Parte 6**: formulario compartido para crear y editar.
+- **Parte 7**: borrado de esculturas con confirmación.
 
 ## Créditos
 
