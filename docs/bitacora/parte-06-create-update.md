@@ -248,7 +248,10 @@ El punto de ruptura de `760px` pasa la rejilla a una columna.
 - Repetí la prueba de interacción con Chrome y DevTools después de mover el textarea:
   - editar una escultura mantiene las 12 tarjetas y muestra el nombre nuevo;
   - crear una escultura deja 13 tarjetas y aparece en la lista.
-- Las capturas son temporales; si guardo alguna en `docs/`, la enlazaré aquí.
+- Las capturas de verificación son temporales. La captura final del formulario de edición, en
+  escritorio y ancho estrecho, queda guardada aquí:
+
+![Formulario de edición de la parte 6](../parte6_cambio_apariencia.jpg)
 
 ## Qué dejo para después
 
