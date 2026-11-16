@@ -242,6 +242,12 @@ Y así después:
 
 ![Lista después del lavado de cara](../parte4_estetica_despues.png)
 
+También guardé una captura de escritorio y otra de la versión móvil:
+
+![Escritorio después del lavado de cara](../parte4_cambio_apariencia_desktop.jpg)
+
+![Móvil después del lavado de cara](../parte4_cambio_apariencia_movil.jpg)
+
 ### Qué cambié
 
 - **Tipografía**: añadí `Outfit` desde Google Fonts para títulos, marca y botones. El texto
