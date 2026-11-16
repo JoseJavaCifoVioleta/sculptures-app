@@ -321,6 +321,84 @@ componente nuevo.
   - listado y detalle a 504 px.
 - Las capturas son temporales y no se suben al repositorio.
 
+## Microanimaciones: entrada escalonada de las tarjetas
+
+Como último toque, añadí una animación de entrada para que las tarjetas no aparezcan de golpe.
+La idea es sencilla: cada tarjeta empieza un poco desplazada hacia abajo y transparente, y va
+apareciendo con un retraso ligeramente mayor que la anterior.
+
+### Cómo lo hice
+
+En el `map` añadí el índice y lo pasé a una variable CSS:
+
+```jsx
+{sculptures.map((sculpture, index) => (
+  <li
+    className="sculpture-card"
+    key={sculpture.id}
+    style={{ '--card-index': String(index) }}
+  >
+```
+
+No es lógica nueva: el índice solo alimenta el CSS. El estilo de la tarjeta queda así:
+
+```css
+.sculpture-card {
+  animation: card-in 0.55s ease backwards;
+  animation-delay: min(calc(var(--card-index, 0) * 55ms), 440ms);
+}
+
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+```
+
+Decisiones:
+
+- **55 ms entre tarjetas** es suficiente para que se note la cascada sin que la última tarde
+  una eternidad.
+- **`min(..., 440ms)`** pone un tope al retraso. Si en la parte 6 se añaden muchas esculturas,
+  las últimas no se quedarían esperando medio minuto. `min()` con valores de tiempo está
+  documentado en MDN:
+  https://developer.mozilla.org/en-US/docs/Web/CSS/min
+- La `key` estable de la parte 5 ayuda aquí: al añadir una escultura, las tarjetas existentes
+  conservan su nodo y no repiten la animación; solo la nueva entra con su retraso.
+- Añadí `animation: none` dentro de `prefers-reduced-motion: reduce`, porque hay usuarios que
+  configuran el sistema para evitar animaciones:
+  https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion
+
+### Fallo: `both` me bloqueaba el hover
+
+Mi primera versión usó `animation-fill-mode: both`, que es lo que se suele ver en los ejemplos.
+El problema es que `both` mantiene aplicado el último fotograma **para siempre**, incluido el
+`transform`. Como las animaciones tienen prioridad sobre las declaraciones normales en la
+cascada, el `transform: translateY(-4px)` del hover no se aplicaba una vez terminada la entrada.
+
+**Solución:** usar `backwards` en vez de `both`. Con `backwards`, el estado inicial se aplica
+durante el retraso, pero al terminar la animación el navegador vuelve a los estilos base. Como
+el último fotograma ya es `opacity: 1` y `translateY(0)`, no hay salto visible y el hover vuelve
+a funcionar.
+
+Información de la propiedad:
+
+- https://developer.mozilla.org/en-US/docs/Web/CSS/animation-fill-mode
+
+### Verificación
+
+- `npm run lint` y `npm run build` pasan.
+- Captura a 300 ms: la primera tarjeta está casi entera, la segunda a medio aparecer y la
+  tercera apenas se intuye. Captura a 3 s: las doce están visibles y colocadas.
+- Probé también con `--force-prefers-reduced-motion`: las tarjetas aparecen completas desde el
+  primer momento, sin animación.
+- Las capturas son temporales y no se suben al repositorio.
+
 ## Fuentes
 
 - Listas y `key`: https://react.dev/learn/rendering-lists
@@ -330,3 +408,6 @@ componente nuevo.
 - `loading` de las imágenes: https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/img#loading
 - Listas de definiciones: https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/dl
 - `aspect-ratio`: https://developer.mozilla.org/en-US/docs/Web/CSS/aspect-ratio
+- `min()`: https://developer.mozilla.org/en-US/docs/Web/CSS/min
+- Animaciones y `animation-fill-mode`: https://developer.mozilla.org/en-US/docs/Web/CSS/animation-fill-mode
+- `prefers-reduced-motion`: https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion

@@ -23,8 +23,12 @@ export default function SculptureListPage() {
       </div>
 
       <ul className="sculpture-grid">
-        {sculptures.map((sculpture) => (
-          <li className="sculpture-card" key={sculpture.id}>
+        {sculptures.map((sculpture, index) => (
+          <li
+            className="sculpture-card"
+            key={sculpture.id}
+            style={{ '--card-index': String(index) }}
+          >
             <div className="sculpture-media">
               <img
                 src={sculpture.url}
