@@ -5,6 +5,7 @@ export default function Layout({
   addSculpture,
   updateSculpture,
   deleteSculpture,
+  resetSculptures,
 }) {
   return (
     <>
@@ -31,6 +32,7 @@ export default function Layout({
             addSculpture,
             updateSculpture,
             deleteSculpture,
+            resetSculptures,
           }}
         />
       </main>

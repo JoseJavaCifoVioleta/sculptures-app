@@ -36,6 +36,7 @@ npm run preview   # previsualizar el build
 sculptures-app/
 ├── docs/
 │   ├── bitacora/          # diario de desarrollo, una entrada por parte
+│   ├── learn/             # material de estudio complementario
 │   └── ...                # enunciado y capturas del proceso
 ├── public/                # favicon e iconos estáticos
 ├── src/
@@ -61,7 +62,7 @@ sculptures-app/
 | 4     | Rutas, navegación y estética                  | ✅     | [Parte 4](docs/bitacora/parte-04-rutas-nav.md)              |
 | 5     | Read: listado y detalle                       | ✅     | [Parte 5](docs/bitacora/parte-05-read.md)                   |
 | 6     | Create + Update con un formulario compartido  | ✅     | [Parte 6](docs/bitacora/parte-06-create-update.md)          |
-| 7     | Delete                                        | ⏳     | —                                                           |
+| 7     | Delete y restaurar catálogo                   | ✅     | [Parte 7](docs/bitacora/parte-07-delete.md)                 |
 | Bonus | Confirmación, validación, filtros, etc.       | ⏳     | —                                                           |
 
 ## Bitácora de desarrollo
@@ -75,10 +76,12 @@ los cambios realizados:
 - [Parte 4 — Rutas, navegación y estética](docs/bitacora/parte-04-rutas-nav.md)
 - [Parte 5 — Read: listado y detalle](docs/bitacora/parte-05-read.md)
 - [Parte 6 — Create + Update: un formulario compartido](docs/bitacora/parte-06-create-update.md)
+- [Parte 7 — Delete](docs/bitacora/parte-07-delete.md)
 
 ## Próximos pasos
 
-- **Parte 7**: borrado de esculturas con confirmación.
+- **Bonus**: confirmación antes de borrar, validación del formulario, filtros por artista y
+  persistencia en `localStorage`.
 
 ## Créditos
 

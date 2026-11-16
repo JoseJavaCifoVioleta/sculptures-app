@@ -32,6 +32,10 @@ export default function App() {
     )
   }
 
+  function resetSculptures() {
+    setSculptures([...sculptureList])
+  }
+
   return (
     <BrowserRouter>
       <Routes>
@@ -43,6 +47,7 @@ export default function App() {
               addSculpture={addSculpture}
               updateSculpture={updateSculpture}
               deleteSculpture={deleteSculpture}
+              resetSculptures={resetSculptures}
             />
           }
         >

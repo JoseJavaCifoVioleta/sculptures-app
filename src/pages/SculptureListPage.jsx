@@ -1,7 +1,7 @@
 import { Link, useOutletContext } from 'react-router-dom'
 
 export default function SculptureListPage() {
-  const { sculptures } = useOutletContext()
+  const { sculptures, deleteSculpture, resetSculptures } = useOutletContext()
 
   return (
     <section className="page">
@@ -20,6 +20,13 @@ export default function SculptureListPage() {
         <Link className="button-primary" to="/sculptures/new">
           Add a sculpture
         </Link>
+        <button
+          className="button-ghost"
+          type="button"
+          onClick={resetSculptures}
+        >
+          Restore original data
+        </button>
       </div>
 
       <ul className="sculpture-grid">
@@ -56,6 +63,14 @@ export default function SculptureListPage() {
                 >
                   Edit
                 </Link>
+                <button
+                  className="button-ghost button-danger"
+                  type="button"
+                  onClick={() => deleteSculpture(sculpture.id)}
+                  aria-label={`Delete ${sculpture.name}`}
+                >
+                  Delete
+                </button>
               </div>
             </div>
           </li>
