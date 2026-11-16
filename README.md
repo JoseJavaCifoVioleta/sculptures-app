@@ -58,7 +58,7 @@ sculptures-app/
 | 1     | Scaffold del proyecto con Vite                | ✅     | [Parte 1](docs/bitacora/parte-01-scaffold.md)               |
 | 2     | Preparar los datos (`src/data.js`)            | ✅     | [Parte 2](docs/bitacora/parte-02-datos.md)                  |
 | 3     | Pensar el diseño antes de codificar           | ✅     | [Parte 3](docs/bitacora/parte-03-diseno.md)                 |
-| 4     | Rutas y barra de navegación                   | ✅     | [Parte 4](docs/bitacora/parte-04-rutas-nav.md)              |
+| 4     | Rutas, navegación y estética                  | ✅     | [Parte 4](docs/bitacora/parte-04-rutas-nav.md)              |
 | 5     | Read: listado y detalle                       | ⏳     | —                                                           |
 | 6     | Create + Update con un formulario compartido  | ⏳     | —                                                           |
 | 7     | Delete                                        | ⏳     | —                                                           |
@@ -72,7 +72,7 @@ los cambios realizados:
 - [Parte 1 — Crear el proyecto con Vite](docs/bitacora/parte-01-scaffold.md)
 - [Parte 2 — Preparar los datos](docs/bitacora/parte-02-datos.md)
 - [Parte 3 — Pensar el diseño antes de codificar](docs/bitacora/parte-03-diseno.md)
-- [Parte 4 — Rutas y barra de navegación](docs/bitacora/parte-04-rutas-nav.md)
+- [Parte 4 — Rutas, navegación y estética](docs/bitacora/parte-04-rutas-nav.md)
 
 ## Próximos pasos
 

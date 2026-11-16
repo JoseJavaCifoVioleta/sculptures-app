@@ -225,4 +225,74 @@ El archivo de prueba lo borré después; no forma parte del proyecto.
 
 - La lista real, el detalle y el formulario (partes 5 y 6).
 - El borrado desde la interfaz (parte 7).
-- Cambios en `data.js`, `main.jsx`, `index.html` o la configuración de Vite.
+- Cambios en `data.js`, `main.jsx` o la configuración de Vite. En `index.html` solo se
+  añadieron la fuente y el título, y el favicon también es nuevo (ver el extra de estética).
+
+## Extra: lavado de cara (después de la parte 4)
+
+Con la parte 4 funcionando, abrí la aplicación y me pareció sosísima: todo blanco, la
+tipografía del sistema y una página casi vacía. Un estudiante tiene derecho a perder un rato
+en la estética, así que me di el gusto **sin tocar rutas, estado ni handlers**.
+
+Así se veía antes:
+
+![Lista antes del lavado de cara](../parte4_practica_ejecucion_codigo_verificando_funcionamiento.jpg)
+
+Y así después:
+
+![Lista después del lavado de cara](../parte4_estetica_despues.png)
+
+### Qué cambié
+
+- **Tipografía**: añadí `Outfit` desde Google Fonts para títulos, marca y botones. El texto
+  normal sigue con la fuente del sistema para no cargar más de la cuenta.
+  https://fonts.google.com/specimen/Outfit
+- **Paleta**: morado y rosa (`#7c3aed` → `#db2777`) con variables CSS, y versión para modo
+  oscuro.
+- **Fondo**: dos degradados radiales suaves con `background-attachment: fixed`. Lo saqué de
+  la documentación de MDN:
+  https://developer.mozilla.org/en-US/docs/Web/CSS/gradient/radial-gradient
+- **Barra superior**: marca con un cuadrado degradado y la letra “S”, navegación en forma de
+  píldoras y fondo semitransparente con `backdrop-filter: blur()`. Para el color mezclado usé
+  `color-mix()`:
+  https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/color-mix
+- **Páginas**: clases reutilizables `.page`, `.eyebrow`, `.page-title`, `.page-lead`,
+  `.stat-card`, `.empty-card`, `.button-primary` y `.button-ghost`.
+- **Página de lista**: ahora tiene un contador grande de esculturas y un botón para añadir.
+- **Detalle, formulario y 404**: en vez de un texto pelado, tienen una tarjeta de “en
+  construcción” con un emoji y un botón para volver.
+- **Footer**: una línea discreta con la tecnología y la fuente de los datos.
+- **Favicon**: sustituí el de Vite por una “S” con el mismo degradado.
+
+### Fallos y ajustes
+
+1. **La barra y el contenido no estaban alineados.** La marca empezaba en `x=112` y el título
+   en `x=181`, porque `main` tenía `max-width: 980px` y la barra ocupaba todo el ancho.
+   Cambié `main` y `.footer` a `max-width: 1126px` (el mismo de `#root`) y ahora comparten
+   margen.
+2. **La captura móvil salía recortada.** Pensé que el CSS desbordaba, pero al comprobar
+   `innerWidth` con Chrome headless me daba `504` en vez de `390`: es el ancho mínimo que usa
+   el navegador en ese modo, no un fallo de la página. Probé a 504 px y la barra, la tarjeta y
+   el pie se adaptan bien. No perdí más tiempo intentando emular un móvil de verdad.
+3. **Dependencia externa de la fuente.** Si no hay internet, el navegador usa la fuente del
+   sistema y la página sigue funcionando. No quise descargar la fuente al proyecto para no
+   meter archivos extra.
+
+### Verificación
+
+- `npm run lint` y `npm run build` siguen pasando.
+- Hice capturas con Chrome headless de la lista, el formulario, el 404, el modo oscuro y un
+  ancho estrecho. Todas se ven correctas y no hay desbordamientos.
+- Las capturas son temporales; no se suben al repositorio.
+
+### Para las siguientes partes
+
+La idea es reutilizar esta base en vez de rehacerla:
+
+- **Parte 5**: una rejilla de tarjetas para las esculturas, reutilizando `.stat-card` y los
+  botones.
+- **Parte 6**: estilos para los campos del formulario.
+- **Parte 7**: un botón de borrar con un color de peligro.
+
+Con esto, cada parte nueva puede añadir un poco de cariño visual sin tener que empezar de
+cero.
