@@ -63,7 +63,8 @@ sculptures-app/
 | 5     | Read: listado y detalle                       | ✅     | [Parte 5](docs/bitacora/parte-05-read.md)                   |
 | 6     | Create + Update con un formulario compartido  | ✅     | [Parte 6](docs/bitacora/parte-06-create-update.md)          |
 | 7     | Delete y restaurar catálogo                   | ✅     | [Parte 7](docs/bitacora/parte-07-delete.md)                 |
-| Bonus | Confirmación, validación, filtros, etc.       | ⏳     | —                                                           |
+| Bonus | Confirmación de borrado con modal             | ✅     | [Bonus 1](docs/bitacora/bonus-01-confirmacion-borrado.md)   |
+| Bonus | Validación, filtros y persistencia            | ⏳     | —                                                           |
 
 ## Bitácora de desarrollo
 
@@ -77,11 +78,12 @@ los cambios realizados:
 - [Parte 5 — Read: listado y detalle](docs/bitacora/parte-05-read.md)
 - [Parte 6 — Create + Update: un formulario compartido](docs/bitacora/parte-06-create-update.md)
 - [Parte 7 — Delete](docs/bitacora/parte-07-delete.md)
+- [Bonus 1 — Confirmar el borrado con un modal](docs/bitacora/bonus-01-confirmacion-borrado.md)
 
 ## Próximos pasos
 
-- **Bonus**: confirmación antes de borrar, validación del formulario, filtros por artista y
-  persistencia en `localStorage`.
+- **Bonus**: validación del formulario, filtros por artista y persistencia en `localStorage`.
+- **Reutilizar el modal** para confirmar también la restauración del catálogo original.
 
 ## Créditos
 

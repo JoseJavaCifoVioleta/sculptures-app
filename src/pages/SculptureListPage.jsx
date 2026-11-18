@@ -1,7 +1,48 @@
+import { useEffect, useRef, useState } from 'react'
 import { Link, useOutletContext } from 'react-router-dom'
 
 export default function SculptureListPage() {
   const { sculptures, deleteSculpture, resetSculptures } = useOutletContext()
+  const dialogRef = useRef(null)
+  const [sculptureToDelete, setSculptureToDelete] = useState(null)
+
+  useEffect(() => {
+    const dialog = dialogRef.current
+    if (!dialog) return
+
+    if (sculptureToDelete) {
+      if (!dialog.open) dialog.showModal()
+      dialog.querySelector('[data-autofocus]')?.focus()
+    } else if (dialog.open) {
+      dialog.close()
+    }
+  }, [sculptureToDelete])
+
+  function confirmDelete() {
+    if (!sculptureToDelete) return
+    deleteSculpture(sculptureToDelete.id)
+    setSculptureToDelete(null)
+  }
+
+  function keepFocusInside(event) {
+    if (event.key !== 'Tab') return
+
+    const focusable = event.currentTarget.querySelectorAll(
+      'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+    )
+    if (focusable.length === 0) return
+
+    const first = focusable[0]
+    const last = focusable[focusable.length - 1]
+
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault()
+      last.focus()
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault()
+      first.focus()
+    }
+  }
 
   return (
     <section className="page">
@@ -66,7 +107,7 @@ export default function SculptureListPage() {
                 <button
                   className="button-ghost button-danger"
                   type="button"
-                  onClick={() => deleteSculpture(sculpture.id)}
+                  onClick={() => setSculptureToDelete(sculpture)}
                   aria-label={`Delete ${sculpture.name}`}
                 >
                   Delete
@@ -76,6 +117,47 @@ export default function SculptureListPage() {
           </li>
         ))}
       </ul>
+
+      <dialog
+        ref={dialogRef}
+        className="confirm-dialog"
+        aria-labelledby="delete-dialog-title"
+        aria-describedby="delete-dialog-description"
+        onClose={() => setSculptureToDelete(null)}
+        onKeyDown={keepFocusInside}
+      >
+        {sculptureToDelete && (
+          <div className="confirm-card">
+            <span className="confirm-icon" aria-hidden="true">
+              🗑️
+            </span>
+            <h2 className="confirm-title" id="delete-dialog-title">
+              Delete sculpture?
+            </h2>
+            <p className="confirm-text" id="delete-dialog-description">
+              “{sculptureToDelete.name}” by {sculptureToDelete.artist} will be
+              removed from the catalogue. This cannot be undone.
+            </p>
+            <div className="confirm-actions">
+              <button
+                className="button-ghost"
+                type="button"
+                data-autofocus
+                onClick={() => setSculptureToDelete(null)}
+              >
+                Cancel
+              </button>
+              <button
+                className="button-danger-solid"
+                type="button"
+                onClick={confirmDelete}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        )}
+      </dialog>
     </section>
   )
 }
