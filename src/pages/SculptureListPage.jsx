@@ -1,48 +1,75 @@
-import { useEffect, useRef, useState } from 'react'
-import { Link, useOutletContext } from 'react-router-dom'
+import { useState } from 'react'
+import { Link, useOutletContext, useSearchParams } from 'react-router-dom'
+import ConfirmDialog from '../components/ConfirmDialog.jsx'
+
+function normalize(value) {
+  return value
+    .toLocaleLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+}
 
 export default function SculptureListPage() {
   const { sculptures, deleteSculpture, resetSculptures } = useOutletContext()
-  const dialogRef = useRef(null)
-  const [sculptureToDelete, setSculptureToDelete] = useState(null)
+  const [searchParams, setSearchParams] = useSearchParams()
+  const [pendingAction, setPendingAction] = useState(null)
 
-  useEffect(() => {
-    const dialog = dialogRef.current
-    if (!dialog) return
+  const artistFilter = searchParams.get('artist') ?? ''
+  const trimmedFilter = artistFilter.trim()
+  const hasFilter = trimmedFilter.length > 0
+  const visibleSculptures = hasFilter
+    ? sculptures.filter((sculpture) =>
+        normalize(sculpture.artist).includes(normalize(trimmedFilter)),
+      )
+    : sculptures
 
-    if (sculptureToDelete) {
-      if (!dialog.open) dialog.showModal()
-      dialog.querySelector('[data-autofocus]')?.focus()
-    } else if (dialog.open) {
-      dialog.close()
+  const showGrid = sculptures.length > 0 && visibleSculptures.length > 0
+
+  function updateArtistFilter(value) {
+    const next = new URLSearchParams(searchParams)
+
+    if (value.trim()) {
+      next.set('artist', value)
+    } else {
+      next.delete('artist')
     }
-  }, [sculptureToDelete])
 
-  function confirmDelete() {
-    if (!sculptureToDelete) return
-    deleteSculpture(sculptureToDelete.id)
-    setSculptureToDelete(null)
+    setSearchParams(next, { replace: true })
   }
 
-  function keepFocusInside(event) {
-    if (event.key !== 'Tab') return
-
-    const focusable = event.currentTarget.querySelectorAll(
-      'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
-    )
-    if (focusable.length === 0) return
-
-    const first = focusable[0]
-    const last = focusable[focusable.length - 1]
-
-    if (event.shiftKey && document.activeElement === first) {
-      event.preventDefault()
-      last.focus()
-    } else if (!event.shiftKey && document.activeElement === last) {
-      event.preventDefault()
-      first.focus()
-    }
+  function clearArtistFilter() {
+    const next = new URLSearchParams(searchParams)
+    next.delete('artist')
+    setSearchParams(next, { replace: true })
   }
+
+  function confirmPendingAction() {
+    if (!pendingAction) return
+
+    if (pendingAction.type === 'delete') {
+      deleteSculpture(pendingAction.sculpture.id)
+    } else {
+      resetSculptures()
+    }
+
+    setPendingAction(null)
+  }
+
+  const dialogContent =
+    pendingAction?.type === 'delete'
+      ? {
+          icon: '🗑️',
+          title: 'Delete sculpture?',
+          description: `“${pendingAction.sculpture.name}” by ${pendingAction.sculpture.artist} will be removed from the catalogue. This cannot be undone.`,
+          confirmLabel: 'Delete',
+        }
+      : {
+          icon: '↺',
+          title: 'Restore original data?',
+          description:
+            'This will replace the current catalogue with the original sculptures from data.js. Any additions, edits or deletions you made will be lost. This cannot be undone.',
+          confirmLabel: 'Restore data',
+        }
 
   return (
     <section className="page">
@@ -64,100 +91,140 @@ export default function SculptureListPage() {
         <button
           className="button-ghost"
           type="button"
-          onClick={resetSculptures}
+          onClick={() => setPendingAction({ type: 'restore' })}
         >
           Restore original data
         </button>
       </div>
 
-      <ul className="sculpture-grid">
-        {sculptures.map((sculpture, index) => (
-          <li
-            className="sculpture-card"
-            key={sculpture.id}
-            style={{ '--card-index': String(index) }}
+      <div className="filter-bar">
+        <div className="form-field">
+          <label className="form-label" htmlFor="artist-filter">
+            Filter by artist
+          </label>
+          <input
+            className="form-input"
+            id="artist-filter"
+            name="artist"
+            type="search"
+            value={artistFilter}
+            onChange={(event) => updateArtistFilter(event.target.value)}
+            placeholder="e.g. Hepworth"
+            autoComplete="off"
+          />
+        </div>
+
+        {hasFilter && (
+          <button
+            className="button-ghost"
+            type="button"
+            onClick={clearArtistFilter}
           >
-            <div className="sculpture-media">
-              <img
-                src={sculpture.url}
-                alt={sculpture.alt}
-                width="80"
-                loading="lazy"
-              />
-            </div>
-
-            <div className="sculpture-body">
-              <p className="sculpture-year">{sculpture.year}</p>
-              <h2 className="sculpture-name">{sculpture.name}</h2>
-              <p className="sculpture-artist">{sculpture.artist}</p>
-
-              <div className="sculpture-actions">
-                <Link
-                  className="button-ghost"
-                  to={`/sculptures/${sculpture.id}`}
-                >
-                  View
-                </Link>
-                <Link
-                  className="button-ghost"
-                  to={`/sculptures/${sculpture.id}/edit`}
-                >
-                  Edit
-                </Link>
-                <button
-                  className="button-ghost button-danger"
-                  type="button"
-                  onClick={() => setSculptureToDelete(sculpture)}
-                  aria-label={`Delete ${sculpture.name}`}
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          </li>
-        ))}
-      </ul>
-
-      <dialog
-        ref={dialogRef}
-        className="confirm-dialog"
-        aria-labelledby="delete-dialog-title"
-        aria-describedby="delete-dialog-description"
-        onClose={() => setSculptureToDelete(null)}
-        onKeyDown={keepFocusInside}
-      >
-        {sculptureToDelete && (
-          <div className="confirm-card">
-            <span className="confirm-icon" aria-hidden="true">
-              🗑️
-            </span>
-            <h2 className="confirm-title" id="delete-dialog-title">
-              Delete sculpture?
-            </h2>
-            <p className="confirm-text" id="delete-dialog-description">
-              “{sculptureToDelete.name}” by {sculptureToDelete.artist} will be
-              removed from the catalogue. This cannot be undone.
-            </p>
-            <div className="confirm-actions">
-              <button
-                className="button-ghost"
-                type="button"
-                data-autofocus
-                onClick={() => setSculptureToDelete(null)}
-              >
-                Cancel
-              </button>
-              <button
-                className="button-danger-solid"
-                type="button"
-                onClick={confirmDelete}
-              >
-                Delete
-              </button>
-            </div>
-          </div>
+            Clear filter
+          </button>
         )}
-      </dialog>
+      </div>
+
+      {hasFilter && sculptures.length > 0 && (
+        <p className="filter-summary" role="status">
+          Showing {visibleSculptures.length} of {sculptures.length}{' '}
+          {sculptures.length === 1 ? 'sculpture' : 'sculptures'} matching “{trimmedFilter}”.
+        </p>
+      )}
+
+      {sculptures.length === 0 && (
+        <div className="empty-card list-empty">
+          <span className="empty-icon" aria-hidden="true">
+            🗿
+          </span>
+          <p className="page-lead">
+            The catalogue is empty. Use “Add a sculpture” or “Restore original
+            data” to start again.
+          </p>
+        </div>
+      )}
+
+      {sculptures.length > 0 && visibleSculptures.length === 0 && (
+        <div className="empty-card list-empty">
+          <span className="empty-icon" aria-hidden="true">
+            🔍
+          </span>
+          <p className="page-lead">No sculptures match “{trimmedFilter}”.</p>
+          <div className="page-actions">
+            <button
+              className="button-ghost"
+              type="button"
+              onClick={clearArtistFilter}
+            >
+              Clear filter
+            </button>
+          </div>
+        </div>
+      )}
+
+      {showGrid && (
+        <ul className="sculpture-grid">
+          {visibleSculptures.map((sculpture, index) => (
+            <li
+              className="sculpture-card"
+              key={sculpture.id}
+              style={{ '--card-index': String(index) }}
+            >
+              <div className="sculpture-media">
+                <img
+                  src={sculpture.url}
+                  alt={sculpture.alt ?? ''}
+                  width="80"
+                  loading="lazy"
+                />
+              </div>
+
+              <div className="sculpture-body">
+                {sculpture.year !== '' && sculpture.year != null && (
+                  <p className="sculpture-year">{sculpture.year}</p>
+                )}
+                <h2 className="sculpture-name">{sculpture.name}</h2>
+                <p className="sculpture-artist">{sculpture.artist}</p>
+
+                <div className="sculpture-actions">
+                  <Link
+                    className="button-ghost"
+                    to={`/sculptures/${sculpture.id}`}
+                  >
+                    View
+                  </Link>
+                  <Link
+                    className="button-ghost"
+                    to={`/sculptures/${sculpture.id}/edit`}
+                  >
+                    Edit
+                  </Link>
+                  <button
+                    className="button-ghost button-danger"
+                    type="button"
+                    onClick={() =>
+                      setPendingAction({ type: 'delete', sculpture })
+                    }
+                    aria-label={`Delete ${sculpture.name}`}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <ConfirmDialog
+        open={Boolean(pendingAction)}
+        icon={dialogContent.icon}
+        title={dialogContent.title}
+        description={dialogContent.description}
+        confirmLabel={dialogContent.confirmLabel}
+        onConfirm={confirmPendingAction}
+        onCancel={() => setPendingAction(null)}
+      />
     </section>
   )
 }

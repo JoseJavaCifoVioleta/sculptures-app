@@ -38,21 +38,27 @@ export default function SculptureDetailPage() {
 
       <div className="detail-layout">
         <div className="detail-media">
-          <img src={sculpture.url} alt={sculpture.alt} width="400" />
+          <img
+            src={sculpture.url}
+            alt={sculpture.alt ?? ''}
+            width="400"
+          />
         </div>
 
         <div className="detail-body">
-          <p className="page-lead">{sculpture.description}</p>
+          <p className="page-lead">{sculpture.description ?? ''}</p>
 
           <dl className="detail-meta">
             <div>
               <dt>Artist</dt>
               <dd>{sculpture.artist}</dd>
             </div>
-            <div>
-              <dt>Year</dt>
-              <dd>{sculpture.year}</dd>
-            </div>
+            {sculpture.year !== '' && sculpture.year != null && (
+              <div>
+                <dt>Year</dt>
+                <dd>{sculpture.year}</dd>
+              </div>
+            )}
             {sculpture.location && (
               <div>
                 <dt>Location</dt>
