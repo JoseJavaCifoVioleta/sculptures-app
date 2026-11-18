@@ -210,6 +210,14 @@ Todo sale de variables que ya existían, más tres nuevas para el botón sólido
 El modo oscuro sigue siendo automático, por `prefers-color-scheme`, sin interruptor en la
 interfaz.
 
+Así se ve el modal en modo claro:
+
+![Modal de confirmación en modo claro](../Modal_confirmacion_claro.png)
+
+Y así en modo oscuro:
+
+![Modal de confirmación en modo oscuro](../Modal_confirmacion_oscuro.png)
+
 ## Accesibilidad
 
 - El diálogo toma su nombre del `<h2>` con `aria-labelledby` y su descripción del párrafo con
