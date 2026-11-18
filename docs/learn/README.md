@@ -97,6 +97,33 @@ Fuentes: [hooks personalizados](https://react.dev/learn/reusing-logic-with-custo
 [`useEffect`](https://react.dev/reference/react/useEffect),
 [`localStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage).
 
+### 5. Paginación sin duplicar estado
+
+La vista paginada no guarda una copia de las esculturas ni un `useState` con la página. Todo se
+deriva de dos cosas: el array filtrado y los parámetros de la URL.
+
+Lo importante:
+
+- `view=pages` activa la vista; sin ese parámetro se muestra el catálogo completo.
+- `page` se lee como número y se limita a `totalPages` con `Math.min`. La URL no puede dejar la
+  pantalla en una página inexistente.
+- `slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)` obtiene solo las tarjetas de esa página.
+- El filtro se aplica **antes** de paginar, y al cambiar el filtro se borra `page` para volver a
+  la primera página.
+- Cambiar de página usa `setSearchParams(next)`, sin `replace`, para que Atrás regrese a la
+  página anterior. Escribir en el filtro sí usa `replace` para no llenar el historial.
+- `aria-current="page"` marca el número activo y los botones Previous/Next se deshabilitan en los
+  extremos.
+- El paginador se oculta cuando solo hay una página: no aporta nada.
+- Si un borrado deja la página actual fuera de rango, un `useEffect` corrige la URL. El efecto
+  comprueba primero si hay algo que corregir para no entrar en un bucle.
+
+Bitácora: [Anexo 1 — Vista paginada](../bitacora/anexo-01-vista-paginada.md)
+
+Fuentes: [`useSearchParams`](https://reactrouter.com/api/hooks/useSearchParams),
+[`Array.prototype.slice`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice),
+[`aria-current`](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Attributes/aria-current).
+
 ## Preguntas para repasar
 
 1. ¿Por qué el filtro no se guarda en un `useState` si al final el input parece un campo
@@ -108,13 +135,17 @@ Fuentes: [hooks personalizados](https://react.dev/learn/reusing-logic-with-custo
 6. ¿Qué anuncia un lector de pantalla al enviar el formulario vacío?
 7. ¿Por qué `replace: true` es importante al escribir en el filtro?
 8. ¿Qué habría que cambiar para que el filtro se conservara al volver del formulario?
+9. ¿Por qué la página actual se deriva de la URL en lugar de guardarse en un `useState`?
+10. ¿Qué ocurre si alguien abre `/?view=pages&page=99` y por qué?
+11. ¿Por qué cambiar de página no usa `replace: true` y el filtro sí?
 
 ## Mapa rápido del código
 
 | Archivo | Qué mirar |
 | --- | --- |
 | `src/components/ConfirmDialog.jsx` | `<dialog>`, foco, Escape, ciclo de Tab |
-| `src/pages/SculptureListPage.jsx` | acciones pendientes, filtro con `useSearchParams`, estados vacíos |
+| `src/components/Pagination.jsx` | Previous/Next, números, `aria-current`, una sola página |
+| `src/pages/SculptureListPage.jsx` | acciones pendientes, filtro y paginación con `useSearchParams`, estados vacíos |
 | `src/pages/SculptureFormPage.jsx` | validación, errores en línea, foco en el primer error |
 | `src/hooks/useSculptures.js` | estado, CRUD y persistencia |
 | `src/App.jsx` | router y composición del hook |
