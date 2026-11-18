@@ -1,6 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useOutletContext, useSearchParams } from 'react-router-dom'
 import ConfirmDialog from '../components/ConfirmDialog.jsx'
+import Pagination from '../components/Pagination.jsx'
+
+const PAGE_SIZE = 6
 
 function normalize(value) {
   return value
@@ -23,7 +26,46 @@ export default function SculptureListPage() {
       )
     : sculptures
 
+  const viewMode = searchParams.get('view') === 'pages' ? 'pages' : 'all'
+  const totalPages = Math.max(
+    1,
+    Math.ceil(visibleSculptures.length / PAGE_SIZE),
+  )
+  const requestedPage = Number(searchParams.get('page') ?? '1')
+  const currentPage =
+    Number.isInteger(requestedPage) && requestedPage >= 1
+      ? Math.min(requestedPage, totalPages)
+      : 1
+  const pageStart = (currentPage - 1) * PAGE_SIZE
+  const listedSculptures =
+    viewMode === 'pages'
+      ? visibleSculptures.slice(pageStart, pageStart + PAGE_SIZE)
+      : visibleSculptures
+  const rangeStart = visibleSculptures.length === 0 ? 0 : pageStart + 1
+  const rangeEnd =
+    viewMode === 'pages'
+      ? Math.min(pageStart + PAGE_SIZE, visibleSculptures.length)
+      : visibleSculptures.length
+
+  // Si la URL pide una página que ya no existe (por un filtro o un borrado),
+  // la recoloca en la última válida para que la barra de direcciones no mienta.
+  useEffect(() => {
+    if (viewMode !== 'pages') return
+
+    const rawPage = searchParams.get('page')
+    if (rawPage === null || rawPage === String(currentPage)) return
+
+    const next = new URLSearchParams(searchParams)
+    if (currentPage === 1) {
+      next.delete('page')
+    } else {
+      next.set('page', String(currentPage))
+    }
+    setSearchParams(next, { replace: true })
+  }, [currentPage, searchParams, setSearchParams, viewMode])
+
   const showGrid = sculptures.length > 0 && visibleSculptures.length > 0
+  const showPagination = viewMode === 'pages' && totalPages > 1
 
   function updateArtistFilter(value) {
     const next = new URLSearchParams(searchParams)
@@ -34,13 +76,45 @@ export default function SculptureListPage() {
       next.delete('artist')
     }
 
+    // Un filtro nuevo siempre empieza por la primera página.
+    next.delete('page')
     setSearchParams(next, { replace: true })
   }
 
   function clearArtistFilter() {
     const next = new URLSearchParams(searchParams)
     next.delete('artist')
+    next.delete('page')
     setSearchParams(next, { replace: true })
+  }
+
+  function changeView(mode) {
+    if (mode === viewMode) return
+
+    const next = new URLSearchParams(searchParams)
+
+    if (mode === 'pages') {
+      next.set('view', 'pages')
+      next.delete('page')
+    } else {
+      next.delete('view')
+      next.delete('page')
+    }
+
+    setSearchParams(next)
+  }
+
+  function goToPage(page) {
+    const next = new URLSearchParams(searchParams)
+    next.set('view', 'pages')
+
+    if (page === 1) {
+      next.delete('page')
+    } else {
+      next.set('page', String(page))
+    }
+
+    setSearchParams(next)
   }
 
   function confirmPendingAction() {
@@ -97,38 +171,71 @@ export default function SculptureListPage() {
         </button>
       </div>
 
-      <div className="filter-bar">
-        <div className="form-field">
-          <label className="form-label" htmlFor="artist-filter">
-            Filter by artist
-          </label>
-          <input
-            className="form-input"
-            id="artist-filter"
-            name="artist"
-            type="search"
-            value={artistFilter}
-            onChange={(event) => updateArtistFilter(event.target.value)}
-            placeholder="e.g. Hepworth"
-            autoComplete="off"
-          />
+      <div className="list-toolbar">
+        <div className="filter-bar">
+          <div className="form-field">
+            <label className="form-label" htmlFor="artist-filter">
+              Filter by artist
+            </label>
+            <input
+              className="form-input"
+              id="artist-filter"
+              name="artist"
+              type="search"
+              value={artistFilter}
+              onChange={(event) => updateArtistFilter(event.target.value)}
+              placeholder="e.g. Hepworth"
+              autoComplete="off"
+            />
+          </div>
+
+          {hasFilter && (
+            <button
+              className="button-ghost"
+              type="button"
+              onClick={clearArtistFilter}
+            >
+              Clear filter
+            </button>
+          )}
         </div>
 
-        {hasFilter && (
+        <div className="view-switch" role="group" aria-label="Layout">
           <button
-            className="button-ghost"
+            className="view-option"
             type="button"
-            onClick={clearArtistFilter}
+            aria-pressed={viewMode === 'all'}
+            onClick={() => changeView('all')}
           >
-            Clear filter
+            All
           </button>
-        )}
+          <button
+            className="view-option"
+            type="button"
+            aria-pressed={viewMode === 'pages'}
+            onClick={() => changeView('pages')}
+          >
+            Pages
+          </button>
+        </div>
       </div>
 
       {hasFilter && sculptures.length > 0 && (
         <p className="filter-summary" role="status">
-          Showing {visibleSculptures.length} of {sculptures.length}{' '}
-          {sculptures.length === 1 ? 'sculpture' : 'sculptures'} matching “{trimmedFilter}”.
+          {viewMode === 'pages'
+            ? `Showing ${rangeStart}–${rangeEnd} of ${visibleSculptures.length} ${
+                visibleSculptures.length === 1 ? 'sculpture' : 'sculptures'
+              } matching “${trimmedFilter}”.`
+            : `Showing ${visibleSculptures.length} of ${sculptures.length} ${
+                sculptures.length === 1 ? 'sculpture' : 'sculptures'
+              } matching “${trimmedFilter}”.`}
+        </p>
+      )}
+
+      {!hasFilter && viewMode === 'pages' && sculptures.length > 0 && (
+        <p className="filter-summary" role="status">
+          Showing {rangeStart}–{rangeEnd} of {sculptures.length}{' '}
+          {sculptures.length === 1 ? 'sculpture' : 'sculptures'}.
         </p>
       )}
 
@@ -164,7 +271,7 @@ export default function SculptureListPage() {
 
       {showGrid && (
         <ul className="sculpture-grid">
-          {visibleSculptures.map((sculpture, index) => (
+          {listedSculptures.map((sculpture, index) => (
             <li
               className="sculpture-card"
               key={sculpture.id}
@@ -214,6 +321,14 @@ export default function SculptureListPage() {
             </li>
           ))}
         </ul>
+      )}
+
+      {showPagination && (
+        <Pagination
+          page={currentPage}
+          totalPages={totalPages}
+          onChange={goToPage}
+        />
       )}
 
       <ConfirmDialog
