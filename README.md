@@ -5,6 +5,15 @@ ejercicio [`React Sculptures CRUD Practice`](React%20Sculptures%20CRUD%20Practic
 un CRUD completo (Create, Read, Update, Delete) con navegación superior mediante
 `react-router-dom`.
 
+## Funcionalidades
+
+- CRUD completo sobre un catálogo de esculturas.
+- Confirmación reutilizable antes de borrar o restaurar, con un `<dialog>` nativo.
+- Validación del formulario con errores en línea y foco en el primer campo inválido.
+- Filtro por artista en la URL (`/?artist=hepworth`), insensible a mayúsculas y acentos.
+- Persistencia en `localStorage` mediante el hook `useSculptures`.
+- Modo claro y oscuro automáticos según la preferencia del sistema.
+
 ## Stack
 
 - **React 19** con componentes funcionales y hooks.
@@ -35,14 +44,16 @@ npm run preview   # previsualizar el build
 ```
 sculptures-app/
 ├── docs/
-│   ├── bitacora/          # diario de desarrollo, una entrada por parte
-│   ├── learn/             # material de estudio complementario
+│   ├── bitacora/          # diario de desarrollo, una entrada por parte o bonus
+│   ├── learn/             # material de estudio y guía de conceptos
 │   └── ...                # enunciado y capturas del proceso
 ├── public/                # favicon e iconos estáticos
 ├── src/
 │   ├── assets/            # imágenes del template de Vite (sin usar)
+│   ├── components/        # ConfirmDialog reutilizable
+│   ├── hooks/             # useSculptures: estado, CRUD y persistencia
 │   ├── pages/             # Layout, listado, detalle, formulario y 404
-│   ├── App.jsx            # router, estado y handlers CRUD
+│   ├── App.jsx            # router y composición de la aplicación
 │   ├── App.css            # estilos de la barra y del contenido
 │   ├── index.css          # estilos globales y variables de tema
 │   ├── data.js            # dataset de esculturas (parte 2)
@@ -63,8 +74,10 @@ sculptures-app/
 | 5     | Read: listado y detalle                       | ✅     | [Parte 5](docs/bitacora/parte-05-read.md)                   |
 | 6     | Create + Update con un formulario compartido  | ✅     | [Parte 6](docs/bitacora/parte-06-create-update.md)          |
 | 7     | Delete y restaurar catálogo                   | ✅     | [Parte 7](docs/bitacora/parte-07-delete.md)                 |
-| Bonus | Confirmación de borrado con modal             | ✅     | [Bonus 1](docs/bitacora/bonus-01-confirmacion-borrado.md)   |
-| Bonus | Validación, filtros y persistencia            | ⏳     | —                                                           |
+| Bonus | Confirmación de borrado y restauración        | ✅     | [Bonus 1](docs/bitacora/bonus-01-confirmacion-borrado.md)   |
+| Bonus | Validación del formulario                     | ✅     | [Bonus 2](docs/bitacora/bonus-02-validacion-formulario.md)  |
+| Bonus | Filtro por artista con `useSearchParams`      | ✅     | [Bonus 3](docs/bitacora/bonus-03-filtro-artista.md)         |
+| Bonus | `useSculptures` y persistencia                | ✅     | [Bonus 4](docs/bitacora/bonus-04-hook-localstorage.md)      |
 
 ## Bitácora de desarrollo
 
@@ -79,11 +92,26 @@ los cambios realizados:
 - [Parte 6 — Create + Update: un formulario compartido](docs/bitacora/parte-06-create-update.md)
 - [Parte 7 — Delete](docs/bitacora/parte-07-delete.md)
 - [Bonus 1 — Confirmar el borrado con un modal](docs/bitacora/bonus-01-confirmacion-borrado.md)
+- [Bonus 2 — Validación del formulario](docs/bitacora/bonus-02-validacion-formulario.md)
+- [Bonus 3 — Filtro por artista con `useSearchParams`](docs/bitacora/bonus-03-filtro-artista.md)
+- [Bonus 4 — `useSculptures` y `localStorage`](docs/bitacora/bonus-04-hook-localstorage.md)
+
+## Material de estudio
+
+La carpeta [`docs/learn/`](docs/learn/) reúne apuntes y una guía de los conceptos que aparecen
+en la práctica:
+
+- [Guía de estudio de los bonus](docs/learn/README.md): `<dialog>`, validación, `useSearchParams`
+  y hooks con `localStorage`, con preguntas para repasar.
+- [Apuntes de React](docs/learn/React_estudio16112026.pdf) y capturas de estudio.
 
 ## Próximos pasos
 
-- **Bonus**: validación del formulario, filtros por artista y persistencia en `localStorage`.
-- **Reutilizar el modal** para confirmar también la restauración del catálogo original.
+La práctica principal y los bonus están completos. Como mejoras opcionales quedarían:
+
+- Borrar también desde la página de detalle, con confirmación y vuelta al listado.
+- Mantener el filtro al crear o editar una escultura.
+- Sustituir `localStorage` por una API real si el catálogo dejara de ser una práctica local.
 
 ## Créditos
 

@@ -127,6 +127,10 @@ function confirmDelete() {
 }
 ```
 
+Esta fue la primera versión, con el diálogo dentro de `SculptureListPage`. Después lo extraje a un
+componente reutilizable para confirmar también la restauración; lo explico en
+“Reutilización para restaurar el catálogo”.
+
 ## Decisiones
 
 - **Un solo diálogo, no uno por tarjeta.** Doce `<dialog>` ocultos serían doce nodos y doce
@@ -218,6 +222,82 @@ Y así en modo oscuro:
 
 ![Modal de confirmación en modo oscuro](../Modal_confirmacion_oscuro.png)
 
+## Reutilización para restaurar el catálogo
+
+“Restore original data” también destruye información: borra las esculturas creadas, deshace las
+ediciones y recupera las que se habían eliminado. Por eso pasó a tener la misma confirmación.
+
+En lugar de duplicar el diálogo, lo extraje a `src/components/ConfirmDialog.jsx`. El componente
+recibe `open`, `icon`, `title`, `description`, `confirmLabel`, `onConfirm` y `onCancel`, y
+conserva todo lo que ya funcionaba: `showModal()`, foco inicial en Cancel, Escape, backdrop,
+bloqueo del scroll y ciclo de Tab.
+
+En la lista, el estado ya no es solo la escultura pendiente, sino la acción pendiente:
+
+```jsx
+const [pendingAction, setPendingAction] = useState(null)
+
+// { type: 'delete', sculpture } o { type: 'restore' }
+```
+
+```jsx
+function confirmPendingAction() {
+  if (!pendingAction) return
+
+  if (pendingAction.type === 'delete') {
+    deleteSculpture(pendingAction.sculpture.id)
+  } else {
+    resetSculptures()
+  }
+
+  setPendingAction(null)
+}
+```
+
+El contenido cambia según la acción:
+
+```jsx
+const dialogContent =
+  pendingAction?.type === 'delete'
+    ? {
+        icon: '🗑️',
+        title: 'Delete sculpture?',
+        description: `“${pendingAction.sculpture.name}” by ${pendingAction.sculpture.artist} will be removed...`,
+        confirmLabel: 'Delete',
+      }
+    : {
+        icon: '↺',
+        title: 'Restore original data?',
+        description:
+          'This will replace the current catalogue with the original sculptures from data.js...',
+        confirmLabel: 'Restore data',
+      }
+```
+
+Decisiones:
+
+- **Un componente, dos usos**: el comportamiento delicado (foco, Escape, scroll) se escribe una
+  vez y no se puede quedar distinto en una de las dos confirmaciones.
+- **Una sola instancia en la página**: el estado `pendingAction` decide qué texto mostrar. No hay
+  dos diálogos ocultos esperando.
+- **Restaurar también es peligroso**: usa el mismo botón rojo sólido, pero con icono ↺ y la
+  etiqueta “Restore data”. El color no significa “borrar”, sino “esto no se puede deshacer”.
+- **El foco sigue empezando en Cancel**, también al restaurar. Enter sin mirar no destruye nada.
+
+Comprobado con las mismas pruebas de antes:
+
+```text
+restaurar: abre modal con su texto: true
+restaurar: foco inicial en Cancel: true
+restaurar: Cancel no restaura: true
+restaurar: Escape no restaura: true
+restaurar: confirma y vuelven las 12: true
+```
+
+Así se ve la confirmación al restaurar:
+
+![Confirmación para restaurar el catálogo original](../Bonus_restaurar_confirmacion.png)
+
 ## Accesibilidad
 
 - El diálogo toma su nombre del `<h2>` con `aria-labelledby` y su descripción del párrafo con
@@ -270,8 +350,6 @@ Los scripts de prueba eran temporales y los borré antes de preparar el commit.
 
 ## Lo que dejo pendiente
 
-- **Reutilizar el modal para “Restore original data”**: la restauración sigue siendo inmediata.
-  El mismo componente podría recibir otro título, otro texto y otro icono.
 - **Confirmar también desde el detalle**, si algún día se añade allí el borrado.
 - **Cerrar al hacer clic en el fondo**: lo dejé fuera a propósito, pero es una decisión de
   producto que se puede cambiar.

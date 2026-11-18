@@ -124,9 +124,8 @@ Decisiones:
   “Restore original data”.
 - **`data.js` sigue siendo la fuente de verdad**: si en el futuro se añade una escultura al
   archivo, el botón también la recuperará.
-- **Sin confirmación por ahora**: un clic restaura inmediatamente. El borrado ya tiene su
-  propio modal, documentado en el [Bonus 1](bonus-01-confirmacion-borrado.md); la restauración
-  sigue pendiente.
+- **Confirmación compartida**: tanto borrar como restaurar pasan por el mismo modal
+  reutilizable, documentado en el [Bonus 1](bonus-01-confirmacion-borrado.md).
 - **Sin estilos nuevos**: el botón reutiliza `.button-ghost`. El pase visual de la parte 7
   puede darle un tratamiento secundario si hace falta.
 
@@ -184,7 +183,7 @@ Chrome headless; si quieres verlo en tu navegador, se puede emular desde DevTool
 
 - ~~**Confirmación antes de borrar** con `window.confirm()`~~: hecha con un `<dialog>` nativo
   en el [Bonus 1](bonus-01-confirmacion-borrado.md).
-- **Confirmación antes de restaurar**, reutilizando ese mismo modal.
+- ~~**Confirmación antes de restaurar**~~: hecha reutilizando ese mismo modal.
 - **Borrar desde el detalle**, con `navigate("/")` después.
 - **Estado vacío** cuando no queda ninguna escultura: la lista se queda sin tarjetas y el
   contador marca 0. No es un fallo, pero se podría mostrar una tarjeta de “no hay esculturas”.
