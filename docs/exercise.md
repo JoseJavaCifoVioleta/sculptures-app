@@ -31,3 +31,31 @@ Add a checkbox that toggles a fade/slide animation effect on the sculpture image
 
 10. **Show More/Less Description**  
 Add a button that toggles between showing a truncated or full sculpture description to practice conditional rendering with useState.
+
+---
+
+## Implementación en `sculptures-app`
+
+Las diez ideas están implementadas en
+[`src/components/SculpturesGallery.jsx`](../src/components/SculpturesGallery.jsx), dentro de la
+ruta `/gallery`. La página [`SculptureGalleryPage.jsx`](../src/pages/SculptureGalleryPage.jsx) le
+pasa el catálogo compartido y un `caption`; el componente usa `"Sculptures Gallery"` si no recibe
+ninguno.
+
+| # | Idea | Implementación | Hecha |
+|---|---|---|---|
+| 1 | Previous | `goPrevious()`; deshabilitado en el primero salvo con Loop | ✅ |
+| 2 | Next deshabilitado en el último | `disabled={!loop && isLast}` | ✅ |
+| 3 | Miniaturas | Tira con una miniatura por escultura; al pulsar cambia el índice | ✅ |
+| 4 | Like por escultura | `likes` indexado por `id`; Like/Unlike, `aria-pressed`, mensaje y corazón en la miniatura | ✅ |
+| 5 | Año | Cada escultura llega por props con su `year` y se muestra como píldora | ✅ |
+| 6 | `caption` | Valor por defecto `"Sculptures Gallery"`; la ruta pasa `"Highlights from the catalogue"` | ✅ |
+| 7 | Wrap-around | El checkbox **Loop** hace que Next/Previous vuelvan al otro extremo | ✅ |
+| 8 | Fondo | Botón que cicla Default → Sand → Sky → Mint → Lilac | ✅ |
+| 9 | Animación | Checkbox que aplica `gallery-image--animated` y respeta `prefers-reduced-motion` | ✅ |
+| 10 | Show more/less | Descripción truncada a 180 caracteres con botón para expandir o contraer | ✅ |
+
+Las ideas 2 y 7 se contradicen: una pide desactivar el botón en el extremo y la otra pide dar la
+vuelta. Se resolvieron con el control **Loop**: apagado se desactiva en los extremos; encendido se
+hace wrap-around. La explicación completa está en
+[`docs/bitacora/anexo-03-galeria.md`](bitacora/anexo-03-galeria.md).

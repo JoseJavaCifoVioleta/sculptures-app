@@ -10,7 +10,7 @@ aplicación: para el diario de desarrollo está [`../bitacora/`](../bitacora/).
   [`image_b7a96c78.jpg`](image_b7a96c78.jpg), [`image_f28cd9f4.jpg`](image_f28cd9f4.jpg) y
   [`image_f9e3af9e.jpg`](image_f9e3af9e.jpg) — capturas de estudio.
 
-## Conceptos de los bonus
+## Conceptos de los bonus y los anexos
 
 ### 1. Confirmar con `<dialog>`
 
@@ -155,6 +155,42 @@ Fuentes: [`URLSearchParams`](https://developer.mozilla.org/en-US/docs/Web/API/UR
 [`aria-pressed`](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Attributes/aria-pressed),
 [renderizar listas](https://react.dev/learn/rendering-lists).
 
+### 7. Galería: estado local y props
+
+La galería de `/gallery` recorre el catálogo con un índice. No guarda una copia de las esculturas:
+las recibe por props desde la página, que a su vez las lee del `Outlet`. Todo lo demás —índice,
+likes, Loop, fondo, animación y descripción expandida— es estado local del componente.
+
+Lo importante:
+
+- `SculpturesGallery` recibe `sculptures` y `caption`. El `caption` tiene valor por defecto
+  (`"Sculptures Gallery"`), pero la ruta le pasa `"Highlights from the catalogue"`.
+- El índice se acota con `Math.min(index, sculptures.length - 1)`. Si se borra la escultura
+  activa, la galería no apunta fuera del array; si el array queda vacío, se muestra un estado
+  vacío con enlace al formulario.
+- Las ideas 2 y 7 del enunciado se contradicen. Un checkbox **Loop** decide el comportamiento:
+  apagado desactiva Previous/Next en los extremos; encendido hace wrap-around.
+- Los likes se guardan en un objeto indexado por `id`, no por posición. Al cambiar de escultura
+  cada una conserva el suyo. La miniatura marca los que tienen like y su `aria-label` añade
+  “(liked)”.
+- `aria-pressed` y un `aria-live="polite"` comunican el estado del like sin depender del color.
+- `expandedId` guarda el `id` de la escultura expandida, no un booleano. Al cambiar de escultura
+  la descripción vuelve a la versión corta sin necesidad de un `useEffect`.
+- Las miniaturas son botones con `aria-current="true"` en la activa. En pantallas estrechas la
+  tira hace scroll horizontal en lugar de comprimir la imagen principal.
+- Los fondos son clases con `color-mix` sobre `--surface`, así el modo oscuro se adapta solo.
+- La imagen lleva `key={sculpture.id}` para que se remonte al cambiar y la animación se reproduzca.
+  El checkbox de animación y `prefers-reduced-motion` controlan si se aplica.
+- La galería ignora el filtro y la paginación del listado: el ejercicio pide recorrer *todas* las
+  esculturas, y mezclar `?q=` con el índice haría que un enlace compartido cambiara de significado.
+
+Bitácora: [Anexo 3 — Galería](../bitacora/anexo-03-galeria.md)
+
+Fuentes: [`useState`](https://react.dev/reference/react/useState),
+[renderizado condicional](https://react.dev/learn/conditional-rendering),
+[`color-mix()`](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/color-mix),
+[`prefers-reduced-motion`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion).
+
 ## Preguntas para repasar
 
 1. ¿Por qué el filtro no se guarda en un `useState` si al final el input parece un campo
@@ -174,6 +210,14 @@ Fuentes: [`URLSearchParams`](https://developer.mozilla.org/en-US/docs/Web/API/UR
 14. ¿Por qué se limpia la consulta al cambiar de campo y no al pulsar “Clear filter”?
 15. ¿Por qué el detalle guarda solo un booleano para el diálogo y la lista guarda la acción
     pendiente?
+16. ¿Por qué la galería recibe las esculturas por props en lugar de leer el hook directamente?
+17. ¿Cómo se resuelve que la idea 2 (desactivar en el extremo) y la idea 7 (wrap-around) se
+    contradigan?
+18. ¿Por qué el índice se acota con `Math.min` y no se guarda ya corregido en el estado?
+19. ¿Qué diferencia hay entre guardar los likes por `id` y guardarlos por posición?
+20. ¿Por qué `expandedId` evita tener que resetear la descripción con un `useEffect`?
+21. ¿Por qué la imagen necesita `key={sculpture.id}` para que la animación se repita?
+22. ¿Qué aportan `aria-pressed`, `aria-current` y `aria-live` en una galería visual?
 
 ## Mapa rápido del código
 
@@ -181,9 +225,12 @@ Fuentes: [`URLSearchParams`](https://developer.mozilla.org/en-US/docs/Web/API/UR
 | --- | --- |
 | `src/components/ConfirmDialog.jsx` | `<dialog>`, foco, Escape, ciclo de Tab |
 | `src/components/Pagination.jsx` | Previous/Next, números, `aria-current`, una sola página |
+| `src/components/SculpturesGallery.jsx` | índice, Loop, likes por `id`, miniaturas, descripción y fondos |
+| `src/pages/SculptureGalleryPage.jsx` | `useOutletContext` y `caption` pasado por props |
 | `src/pages/SculptureListPage.jsx` | acciones pendientes, filtro por campo y paginación con `useSearchParams`, estados vacíos |
 | `src/pages/SculptureDetailPage.jsx` | detalle, borrado con confirmación y vuelta al listado |
 | `src/pages/SculptureFormPage.jsx` | validación, errores en línea, foco en el primer error |
 | `src/hooks/useSculptures.js` | estado, CRUD y persistencia |
 | `src/App.jsx` | router y composición del hook |
+| `src/pages/Layout.jsx` | barra superior, enlaces y `Outlet` con el contexto |
 | `src/index.css` | variables de tema, incluidos los colores de peligro |
