@@ -5,6 +5,33 @@ import Pagination from '../components/Pagination.jsx'
 
 const PAGE_SIZE = 6
 
+const FILTER_FIELDS = [
+  {
+    id: 'artist',
+    label: 'Artist',
+    placeholder: 'e.g. Hepworth',
+    getValue: (sculpture) => sculpture.artist,
+  },
+  {
+    id: 'name',
+    label: 'Name',
+    placeholder: 'e.g. Moai',
+    getValue: (sculpture) => sculpture.name,
+  },
+  {
+    id: 'year',
+    label: 'Year',
+    placeholder: 'e.g. 2023',
+    getValue: (sculpture) => String(sculpture.year ?? ''),
+  },
+  {
+    id: 'description',
+    label: 'Description',
+    placeholder: 'e.g. bronze',
+    getValue: (sculpture) => sculpture.description ?? '',
+  },
+]
+
 function normalize(value) {
   return value
     .toLocaleLowerCase()
@@ -17,12 +44,22 @@ export default function SculptureListPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const [pendingAction, setPendingAction] = useState(null)
 
-  const artistFilter = searchParams.get('artist') ?? ''
-  const trimmedFilter = artistFilter.trim()
-  const hasFilter = trimmedFilter.length > 0
+  const rawField = searchParams.get('field')
+  const activeField =
+    FILTER_FIELDS.find((option) => option.id === rawField) ?? FILTER_FIELDS[0]
+  // Compatibilidad: los enlaces antiguos ?artist=colvin siguen funcionando.
+  const filterQuery =
+    searchParams.get('q') ??
+    (rawField === null ? searchParams.get('artist') : null) ??
+    ''
+  const trimmedQuery = filterQuery.trim()
+  const hasFilter = trimmedQuery.length > 0
+  const fieldName = activeField.label.toLocaleLowerCase()
   const visibleSculptures = hasFilter
     ? sculptures.filter((sculpture) =>
-        normalize(sculpture.artist).includes(normalize(trimmedFilter)),
+        normalize(activeField.getValue(sculpture)).includes(
+          normalize(trimmedQuery),
+        ),
       )
     : sculptures
 
@@ -67,22 +104,48 @@ export default function SculptureListPage() {
   const showGrid = sculptures.length > 0 && visibleSculptures.length > 0
   const showPagination = viewMode === 'pages' && totalPages > 1
 
-  function updateArtistFilter(value) {
+  function updateFilterQuery(value) {
     const next = new URLSearchParams(searchParams)
 
+    // Normaliza el enlace heredado ?artist=... al nuevo ?q=...
+    next.delete('artist')
+    next.delete('page')
+
     if (value.trim()) {
-      next.set('artist', value)
+      next.set('q', value)
     } else {
-      next.delete('artist')
+      next.delete('q')
     }
 
-    // Un filtro nuevo siempre empieza por la primera página.
-    next.delete('page')
+    if (activeField.id === 'artist') {
+      next.delete('field')
+    } else {
+      next.set('field', activeField.id)
+    }
+
     setSearchParams(next, { replace: true })
   }
 
-  function clearArtistFilter() {
+  function changeFilterField(fieldId) {
+    if (fieldId === activeField.id) return
+
     const next = new URLSearchParams(searchParams)
+    next.delete('artist')
+    next.delete('q')
+    next.delete('page')
+
+    if (fieldId === 'artist') {
+      next.delete('field')
+    } else {
+      next.set('field', fieldId)
+    }
+
+    setSearchParams(next, { replace: true })
+  }
+
+  function clearFilter() {
+    const next = new URLSearchParams(searchParams)
+    next.delete('q')
     next.delete('artist')
     next.delete('page')
     setSearchParams(next, { replace: true })
@@ -173,31 +236,51 @@ export default function SculptureListPage() {
 
       <div className="list-toolbar">
         <div className="filter-bar">
-          <div className="form-field">
-            <label className="form-label" htmlFor="artist-filter">
-              Filter by artist
-            </label>
-            <input
-              className="form-input"
-              id="artist-filter"
-              name="artist"
-              type="search"
-              value={artistFilter}
-              onChange={(event) => updateArtistFilter(event.target.value)}
-              placeholder="e.g. Hepworth"
-              autoComplete="off"
-            />
+          <div className="filter-fields-row">
+            <span className="form-label" id="filter-field-label">
+              Filter by
+            </span>
+            <div
+              className="filter-fields"
+              role="group"
+              aria-labelledby="filter-field-label"
+            >
+              {FILTER_FIELDS.map((field) => (
+                <button
+                  className="filter-field"
+                  key={field.id}
+                  type="button"
+                  aria-pressed={activeField.id === field.id}
+                  onClick={() => changeFilterField(field.id)}
+                >
+                  {field.label}
+                </button>
+              ))}
+            </div>
           </div>
 
-          {hasFilter && (
-            <button
-              className="button-ghost"
-              type="button"
-              onClick={clearArtistFilter}
-            >
-              Clear filter
-            </button>
-          )}
+          <div className="filter-query-row">
+            <input
+              className="form-input"
+              id="catalogue-filter"
+              type="search"
+              value={filterQuery}
+              onChange={(event) => updateFilterQuery(event.target.value)}
+              placeholder={activeField.placeholder}
+              aria-label={`Filter by ${fieldName}`}
+              autoComplete="off"
+            />
+
+            {hasFilter && (
+              <button
+                className="button-ghost"
+                type="button"
+                onClick={clearFilter}
+              >
+                Clear filter
+              </button>
+            )}
+          </div>
         </div>
 
         <div className="view-switch" role="group" aria-label="Layout">
@@ -225,10 +308,10 @@ export default function SculptureListPage() {
           {viewMode === 'pages'
             ? `Showing ${rangeStart}–${rangeEnd} of ${visibleSculptures.length} ${
                 visibleSculptures.length === 1 ? 'sculpture' : 'sculptures'
-              } matching “${trimmedFilter}”.`
+              } where ${fieldName} matches “${trimmedQuery}”.`
             : `Showing ${visibleSculptures.length} of ${sculptures.length} ${
                 sculptures.length === 1 ? 'sculpture' : 'sculptures'
-              } matching “${trimmedFilter}”.`}
+              } where ${fieldName} matches “${trimmedQuery}”.`}
         </p>
       )}
 
@@ -256,12 +339,14 @@ export default function SculptureListPage() {
           <span className="empty-icon" aria-hidden="true">
             🔍
           </span>
-          <p className="page-lead">No sculptures match “{trimmedFilter}”.</p>
+          <p className="page-lead">
+            No sculptures where {fieldName} matches “{trimmedQuery}”.
+          </p>
           <div className="page-actions">
             <button
               className="button-ghost"
               type="button"
-              onClick={clearArtistFilter}
+              onClick={clearFilter}
             >
               Clear filter
             </button>

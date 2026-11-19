@@ -10,7 +10,8 @@ un CRUD completo (Create, Read, Update, Delete) con navegación superior mediant
 - CRUD completo sobre un catálogo de esculturas.
 - Confirmación reutilizable antes de borrar o restaurar, con un `<dialog>` nativo.
 - Validación del formulario con errores en línea y foco en el primer campo inválido.
-- Filtro por artista en la URL (`/?artist=hepworth`), insensible a mayúsculas y acentos.
+- Filtro por artista, nombre, año o descripción (`?field=year&q=2024`), insensible a mayúsculas
+  y acentos. Los enlaces antiguos `?artist=hepworth` siguen funcionando.
 - Dos vistas conmutables: catálogo completo o paginado de seis en seis, con el estado en la URL
   (`/?view=pages&page=2`).
 - Persistencia en `localStorage` mediante el hook `useSculptures`.
@@ -81,6 +82,7 @@ sculptures-app/
 | Bonus | Filtro por artista con `useSearchParams`      | ✅     | [Bonus 3](docs/bitacora/bonus-03-filtro-artista.md)         |
 | Bonus | `useSculptures` y persistencia                | ✅     | [Bonus 4](docs/bitacora/bonus-04-hook-localstorage.md)      |
 | Anexo | Vista paginada con conmutador                 | ✅     | [Anexo 1](docs/bitacora/anexo-01-vista-paginada.md)         |
+| Anexo | Filtro por campo seleccionable                | ✅     | [Anexo 2](docs/bitacora/anexo-02-filtro-por-campo.md)       |
 
 ## Bitácora de desarrollo
 
@@ -99,6 +101,7 @@ los cambios realizados:
 - [Bonus 3 — Filtro por artista con `useSearchParams`](docs/bitacora/bonus-03-filtro-artista.md)
 - [Bonus 4 — `useSculptures` y `localStorage`](docs/bitacora/bonus-04-hook-localstorage.md)
 - [Anexo 1 — Vista paginada con conmutador](docs/bitacora/anexo-01-vista-paginada.md)
+- [Anexo 2 — Filtro por campo seleccionable](docs/bitacora/anexo-02-filtro-por-campo.md)
 
 ## Material de estudio
 
@@ -106,7 +109,7 @@ La carpeta [`docs/learn/`](docs/learn/) reúne apuntes y una guía de los concep
 en la práctica:
 
 - [Guía de estudio de los bonus](docs/learn/README.md): `<dialog>`, validación, `useSearchParams`,
-  hooks con `localStorage` y paginación, con preguntas para repasar.
+  filtros por campo, hooks con `localStorage` y paginación, con preguntas para repasar.
 - [Apuntes de React](docs/learn/React_estudio16112026.pdf) y capturas de estudio.
 
 ## Próximos pasos

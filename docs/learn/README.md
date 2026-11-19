@@ -74,6 +74,9 @@ Fuentes: [`useSearchParams`](https://reactrouter.com/api/hooks/useSearchParams),
 [`URLSearchParams`](https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams),
 [`String.normalize`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize).
 
+El Anexo 2 generaliza este filtro a varios campos (`?field=...&q=...`), manteniendo `?artist=...`
+como enlace heredado. Lo explico en la sección 6.
+
 ### 4. Hook propio y `localStorage`
 
 Un hook personalizado es una función que empieza por `use` y llama a otros hooks. Sirve para
@@ -124,6 +127,31 @@ Fuentes: [`useSearchParams`](https://reactrouter.com/api/hooks/useSearchParams),
 [`Array.prototype.slice`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice),
 [`aria-current`](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Attributes/aria-current).
 
+### 6. Un filtro, varios campos
+
+El campo sobre el que se busca también vive en la URL: `field` dice cuál es y `q` guarda la
+consulta. La interfaz solo dibuja un grupo de botones a partir de una lista de configuración.
+
+Lo importante:
+
+- `?field=name&q=moai` es explícito y compartible. Sin `field`, se asume `artist`.
+- Antes de usar el campo se comprueba que esté en la lista blanca; un valor inventado cae en el
+  campo por defecto en vez de romper.
+- Cada campo define un `getValue(sculpture)`. Añadir uno nuevo es añadir un objeto, no duplicar
+  condiciones por toda la página.
+- Los botones usan `aria-pressed` dentro de un `role="group"` con `aria-labelledby="Filter by"`.
+- Al cambiar de campo se borra la consulta: evita buscar “Hepworth” dentro de `year`.
+- “Clear filter” vacía la consulta pero conserva el campo seleccionado.
+- Los enlaces antiguos `?artist=...` se siguen leyendo; al escribir se normalizan a `?q=...`.
+- Year se compara como texto, así que `202` encuentra 2023, 2024 y 2025.
+- El resumen nombra el campo (“where year matches…”) para que el resultado no sea ambiguo.
+
+Bitácora: [Anexo 2 — Filtro por campo](../bitacora/anexo-02-filtro-por-campo.md)
+
+Fuentes: [`URLSearchParams`](https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams),
+[`aria-pressed`](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Attributes/aria-pressed),
+[renderizar listas](https://react.dev/learn/rendering-lists).
+
 ## Preguntas para repasar
 
 1. ¿Por qué el filtro no se guarda en un `useState` si al final el input parece un campo
@@ -138,6 +166,9 @@ Fuentes: [`useSearchParams`](https://reactrouter.com/api/hooks/useSearchParams),
 9. ¿Por qué la página actual se deriva de la URL en lugar de guardarse en un `useState`?
 10. ¿Qué ocurre si alguien abre `/?view=pages&page=99` y por qué?
 11. ¿Por qué cambiar de página no usa `replace: true` y el filtro sí?
+12. ¿Por qué se usa un solo par `field` + `q` en lugar de un parámetro por campo?
+13. ¿Qué ventaja tiene que cada campo defina su propio `getValue`?
+14. ¿Por qué se limpia la consulta al cambiar de campo y no al pulsar “Clear filter”?
 
 ## Mapa rápido del código
 
@@ -145,7 +176,7 @@ Fuentes: [`useSearchParams`](https://reactrouter.com/api/hooks/useSearchParams),
 | --- | --- |
 | `src/components/ConfirmDialog.jsx` | `<dialog>`, foco, Escape, ciclo de Tab |
 | `src/components/Pagination.jsx` | Previous/Next, números, `aria-current`, una sola página |
-| `src/pages/SculptureListPage.jsx` | acciones pendientes, filtro y paginación con `useSearchParams`, estados vacíos |
+| `src/pages/SculptureListPage.jsx` | acciones pendientes, filtro por campo y paginación con `useSearchParams`, estados vacíos |
 | `src/pages/SculptureFormPage.jsx` | validación, errores en línea, foco en el primer error |
 | `src/hooks/useSculptures.js` | estado, CRUD y persistencia |
 | `src/App.jsx` | router y composición del hook |
