@@ -21,6 +21,7 @@ export default function Layout({
           <NavLink to="/" end>
             List
           </NavLink>
+          <NavLink to="/gallery">Gallery</NavLink>
           <NavLink to="/sculptures/new">Add</NavLink>
         </div>
       </nav>
