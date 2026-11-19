@@ -1,8 +1,17 @@
-import { Link, useOutletContext, useParams } from 'react-router-dom'
+import { useState } from 'react'
+import {
+  Link,
+  useNavigate,
+  useOutletContext,
+  useParams,
+} from 'react-router-dom'
+import ConfirmDialog from '../components/ConfirmDialog.jsx'
 
 export default function SculptureDetailPage() {
   const { id } = useParams()
-  const { sculptures } = useOutletContext()
+  const { sculptures, deleteSculpture } = useOutletContext()
+  const navigate = useNavigate()
+  const [confirmOpen, setConfirmOpen] = useState(false)
 
   const sculpture = sculptures.find(
     (item) => String(item.id) === String(id),
@@ -29,6 +38,12 @@ export default function SculptureDetailPage() {
         </div>
       </section>
     )
+  }
+
+  function handleDelete() {
+    deleteSculpture(sculpture.id)
+    setConfirmOpen(false)
+    navigate('/')
   }
 
   return (
@@ -71,9 +86,27 @@ export default function SculptureDetailPage() {
             <Link className="button-ghost" to="/">
               Back to list
             </Link>
+            <button
+              className="button-ghost button-danger"
+              type="button"
+              onClick={() => setConfirmOpen(true)}
+              aria-label={`Delete ${sculpture.name}`}
+            >
+              Delete
+            </button>
           </div>
         </div>
       </div>
+
+      <ConfirmDialog
+        open={confirmOpen}
+        icon="🗑️"
+        title="Delete sculpture?"
+        description={`“${sculpture.name}” by ${sculpture.artist} will be removed from the catalogue. This cannot be undone.`}
+        confirmLabel="Delete"
+        onConfirm={handleDelete}
+        onCancel={() => setConfirmOpen(false)}
+      />
     </section>
   )
 }

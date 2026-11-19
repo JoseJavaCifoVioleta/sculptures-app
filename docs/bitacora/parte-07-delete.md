@@ -184,7 +184,8 @@ Chrome headless; si quieres verlo en tu navegador, se puede emular desde DevTool
 - ~~**Confirmación antes de borrar** con `window.confirm()`~~: hecha con un `<dialog>` nativo
   en el [Bonus 1](bonus-01-confirmacion-borrado.md).
 - ~~**Confirmación antes de restaurar**~~: hecha reutilizando ese mismo modal.
-- **Borrar desde el detalle**, con `navigate("/")` después.
+- ~~**Borrar desde el detalle**, con `navigate("/")` después~~: hecho en el
+  [Bonus 5](bonus-05-borrado-detalle.md) reutilizando el mismo modal.
 - **Estado vacío** cuando no queda ninguna escultura: la lista se queda sin tarjetas y el
   contador marca 0. No es un fallo, pero se podría mostrar una tarjeta de “no hay esculturas”.
 

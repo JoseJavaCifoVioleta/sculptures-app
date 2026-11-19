@@ -9,6 +9,7 @@ un CRUD completo (Create, Read, Update, Delete) con navegación superior mediant
 
 - CRUD completo sobre un catálogo de esculturas.
 - Confirmación reutilizable antes de borrar o restaurar, con un `<dialog>` nativo.
+- Borrado tanto desde el listado como desde el detalle, con vuelta al catálogo tras confirmar.
 - Validación del formulario con errores en línea y foco en el primer campo inválido.
 - Filtro por artista, nombre, año o descripción (`?field=year&q=2024`), insensible a mayúsculas
   y acentos. Los enlaces antiguos `?artist=hepworth` siguen funcionando.
@@ -81,6 +82,7 @@ sculptures-app/
 | Bonus | Validación del formulario                     | ✅     | [Bonus 2](docs/bitacora/bonus-02-validacion-formulario.md)  |
 | Bonus | Filtro por artista con `useSearchParams`      | ✅     | [Bonus 3](docs/bitacora/bonus-03-filtro-artista.md)         |
 | Bonus | `useSculptures` y persistencia                | ✅     | [Bonus 4](docs/bitacora/bonus-04-hook-localstorage.md)      |
+| Bonus | Borrado desde el detalle                     | ✅     | [Bonus 5](docs/bitacora/bonus-05-borrado-detalle.md)        |
 | Anexo | Vista paginada con conmutador                 | ✅     | [Anexo 1](docs/bitacora/anexo-01-vista-paginada.md)         |
 | Anexo | Filtro por campo seleccionable                | ✅     | [Anexo 2](docs/bitacora/anexo-02-filtro-por-campo.md)       |
 
@@ -100,6 +102,7 @@ los cambios realizados:
 - [Bonus 2 — Validación del formulario](docs/bitacora/bonus-02-validacion-formulario.md)
 - [Bonus 3 — Filtro por artista con `useSearchParams`](docs/bitacora/bonus-03-filtro-artista.md)
 - [Bonus 4 — `useSculptures` y `localStorage`](docs/bitacora/bonus-04-hook-localstorage.md)
+- [Bonus 5 — Borrado desde el detalle](docs/bitacora/bonus-05-borrado-detalle.md)
 - [Anexo 1 — Vista paginada con conmutador](docs/bitacora/anexo-01-vista-paginada.md)
 - [Anexo 2 — Filtro por campo seleccionable](docs/bitacora/anexo-02-filtro-por-campo.md)
 
@@ -109,14 +112,14 @@ La carpeta [`docs/learn/`](docs/learn/) reúne apuntes y una guía de los concep
 en la práctica:
 
 - [Guía de estudio de los bonus](docs/learn/README.md): `<dialog>`, validación, `useSearchParams`,
-  filtros por campo, hooks con `localStorage` y paginación, con preguntas para repasar.
+  filtros por campo, hooks con `localStorage`, paginación y borrado desde el detalle, con
+  preguntas para repasar.
 - [Apuntes de React](docs/learn/React_estudio16112026.pdf) y capturas de estudio.
 
 ## Próximos pasos
 
-La práctica principal, los bonus y el anexo están completos. Como mejoras opcionales quedarían:
+La práctica principal, los bonus y los anexos están completos. Como mejoras opcionales quedarían:
 
-- Borrar también desde la página de detalle, con confirmación y vuelta al listado.
 - Mantener el filtro, la vista y la página al crear o editar una escultura.
 - Sustituir `localStorage` por una API real si el catálogo dejara de ser una práctica local.
 

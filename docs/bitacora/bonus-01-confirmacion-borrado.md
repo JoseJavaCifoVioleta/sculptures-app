@@ -350,7 +350,8 @@ Los scripts de prueba eran temporales y los borré antes de preparar el commit.
 
 ## Lo que dejo pendiente
 
-- **Confirmar también desde el detalle**, si algún día se añade allí el borrado.
+- ~~**Confirmar también desde el detalle**, si algún día se añade allí el borrado~~: hecho en el
+  [Bonus 5](bonus-05-borrado-detalle.md).
 - **Cerrar al hacer clic en el fondo**: lo dejé fuera a propósito, pero es una decisión de
   producto que se puede cambiar.
 

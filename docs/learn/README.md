@@ -26,8 +26,11 @@ Lo importante:
 - Un `onKeyDown` con `Tab` y `Shift+Tab` cierra el ciclo si se quiere un foco estrictamente
   atrapado.
 - `html:has(dialog[open]) { overflow: hidden }` evita que la página de detrás haga scroll.
+- El mismo `ConfirmDialog` se reutiliza en la lista (borrar y restaurar) y en el detalle (borrar
+  y volver al catálogo).
 
-Bitácora: [Bonus 1 — Confirmar el borrado](../bitacora/bonus-01-confirmacion-borrado.md)
+Bitácora: [Bonus 1 — Confirmar el borrado](../bitacora/bonus-01-confirmacion-borrado.md) y
+[Bonus 5 — Borrado desde el detalle](../bitacora/bonus-05-borrado-detalle.md)
 
 Fuentes: [HTMLDialogElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLDialogElement),
 [`showModal()`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLDialogElement/showModal),
@@ -169,6 +172,8 @@ Fuentes: [`URLSearchParams`](https://developer.mozilla.org/en-US/docs/Web/API/UR
 12. ¿Por qué se usa un solo par `field` + `q` en lugar de un parámetro por campo?
 13. ¿Qué ventaja tiene que cada campo defina su propio `getValue`?
 14. ¿Por qué se limpia la consulta al cambiar de campo y no al pulsar “Clear filter”?
+15. ¿Por qué el detalle guarda solo un booleano para el diálogo y la lista guarda la acción
+    pendiente?
 
 ## Mapa rápido del código
 
@@ -177,6 +182,7 @@ Fuentes: [`URLSearchParams`](https://developer.mozilla.org/en-US/docs/Web/API/UR
 | `src/components/ConfirmDialog.jsx` | `<dialog>`, foco, Escape, ciclo de Tab |
 | `src/components/Pagination.jsx` | Previous/Next, números, `aria-current`, una sola página |
 | `src/pages/SculptureListPage.jsx` | acciones pendientes, filtro por campo y paginación con `useSearchParams`, estados vacíos |
+| `src/pages/SculptureDetailPage.jsx` | detalle, borrado con confirmación y vuelta al listado |
 | `src/pages/SculptureFormPage.jsx` | validación, errores en línea, foco en el primer error |
 | `src/hooks/useSculptures.js` | estado, CRUD y persistencia |
 | `src/App.jsx` | router y composición del hook |
