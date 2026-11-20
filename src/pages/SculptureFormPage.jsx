@@ -7,6 +7,8 @@ function emptyForm() {
     artist: '',
     year: '',
     location: '',
+    material: '',
+    dimensions: '',
     url: '',
     alt: '',
     description: '',
@@ -19,6 +21,8 @@ function formFromSculpture(sculpture) {
     artist: sculpture.artist,
     year: sculpture.year == null ? '' : String(sculpture.year),
     location: sculpture.location ?? '',
+    material: sculpture.material ?? '',
+    dimensions: sculpture.dimensions ?? '',
     url: sculpture.url,
     alt: sculpture.alt ?? '',
     description: sculpture.description ?? '',
@@ -84,24 +88,15 @@ function SculptureForm({ id }) {
 
   if (isEdit && !sculpture) {
     return (
-      <section className="page">
-        <p className="eyebrow">Not found</p>
-        <h1 className="page-title">Sculpture not found</h1>
-
-        <div className="empty-card">
-          <span className="empty-icon" aria-hidden="true">
-            🗿
-          </span>
-          <p className="page-lead">
-            There is no sculpture with id {id} to edit.
-          </p>
-
-          <div className="page-actions">
-            <Link className="button-ghost" to="/">
-              Back to list
-            </Link>
-          </div>
-        </div>
+      <section className="notice-page">
+        <p className="section-label">Not in the index</p>
+        <h1 className="notice-title">This work could not be edited.</h1>
+        <p className="notice-text">
+          There is no sculpture with the reference {id} in the catalogue.
+        </p>
+        <Link className="text-link" to="/">
+          Return to the index
+        </Link>
       </section>
     )
   }
@@ -127,6 +122,8 @@ function SculptureForm({ id }) {
       artist: form.artist.trim(),
       year: form.year.trim(),
       location: form.location.trim(),
+      material: form.material.trim(),
+      dimensions: form.dimensions.trim(),
       url: form.url.trim(),
       alt: form.alt.trim(),
       description: form.description.trim(),
@@ -159,15 +156,15 @@ function SculptureForm({ id }) {
   }
 
   return (
-    <section className="page">
-      <p className="eyebrow">{isEdit ? 'Update' : 'Create'}</p>
-      <h1 className="page-title">
-        {isEdit ? 'Edit sculpture' : 'New sculpture'}
+    <section className="form-page">
+      <p className="section-label">{isEdit ? 'Edit entry' : 'New entry'}</p>
+      <h1 className="form-title">
+        {isEdit ? 'Edit work' : 'Add a work'}
       </h1>
-      <p className="page-lead">
+      <p className="form-intro">
         {isEdit
-          ? `Update the details of ${sculpture.name}.`
-          : 'Add a new sculpture to the catalogue.'}
+          ? `Update the catalogue record for ${sculpture.name}.`
+          : 'Add a sculpture to the index. Material and dimensions are optional, but they complete the museum record.'}
       </p>
 
       <form className="sculpture-form" onSubmit={handleSubmit} noValidate>
@@ -261,6 +258,36 @@ function SculptureForm({ id }) {
           </div>
 
           <div className="form-field">
+            <label className="form-label" htmlFor="material">
+              Material
+            </label>
+            <input
+              className="form-input"
+              id="material"
+              name="material"
+              type="text"
+              value={form.material}
+              onChange={handleChange}
+              placeholder="e.g. Bronze"
+            />
+          </div>
+
+          <div className="form-field">
+            <label className="form-label" htmlFor="dimensions">
+              Dimensions
+            </label>
+            <input
+              className="form-input"
+              id="dimensions"
+              name="dimensions"
+              type="text"
+              value={form.dimensions}
+              onChange={handleChange}
+              placeholder="e.g. 290 × 110 × 90 cm"
+            />
+          </div>
+
+          <div className="form-field form-field-wide">
             <label className="form-label" htmlFor="url">
               Image URL
             </label>
@@ -282,7 +309,7 @@ function SculptureForm({ id }) {
             )}
           </div>
 
-          <div className="form-field">
+          <div className="form-field form-field-wide">
             <label className="form-label" htmlFor="alt">
               Image description
             </label>
@@ -311,11 +338,11 @@ function SculptureForm({ id }) {
           </div>
         </div>
 
-        <div className="page-actions form-actions">
+        <div className="form-actions">
           <button className="button-primary" type="submit">
-            {isEdit ? 'Save changes' : 'Create sculpture'}
+            {isEdit ? 'Save changes' : 'Add to catalogue'}
           </button>
-          <Link className="button-ghost" to="/">
+          <Link className="text-link" to="/">
             Cancel
           </Link>
         </div>

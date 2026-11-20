@@ -2,18 +2,16 @@ import { Link } from 'react-router-dom'
 
 export default function NoPage() {
   return (
-    <section className="page">
-      <p className="eyebrow">404</p>
-      <h1 className="page-title">This page is not in the gallery</h1>
-      <p className="page-lead">
-        The address you typed does not exist. Let's go back to the sculptures.
+    <section className="notice-page">
+      <p className="section-label">404 — Not in the index</p>
+      <h1 className="notice-title">This page is not part of the collection.</h1>
+      <p className="notice-text">
+        The address you typed does not exist. Return to the index to continue
+        through the catalogue.
       </p>
-
-      <div className="page-actions">
-        <Link className="button-primary" to="/">
-          Back to the list
-        </Link>
-      </div>
+      <Link className="text-link" to="/">
+        Back to the index
+      </Link>
     </section>
   )
 }

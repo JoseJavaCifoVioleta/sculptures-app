@@ -1,4 +1,5 @@
-import { Link, NavLink, Outlet } from 'react-router-dom'
+import { useEffect } from 'react'
+import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 
 export default function Layout({
   sculptures,
@@ -7,26 +8,42 @@ export default function Layout({
   deleteSculpture,
   resetSculptures,
 }) {
+  const { hash } = useLocation()
+
+  useEffect(() => {
+    if (!hash) return
+
+    const target = document.getElementById(hash.slice(1))
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }, [hash])
+
   return (
     <>
-      <nav className="topbar">
-        <Link to="/" className="brand">
-          <span className="brand-mark" aria-hidden="true">
-            S
-          </span>
-          <span>Sculptures</span>
+      <header className="site-header">
+        <Link to="/" className="brand" aria-label="Sculptures, home">
+          <span className="brand-name">Sculptures</span>
+          <span className="brand-note">A contemporary index</span>
         </Link>
 
-        <div className="nav-links">
+        <nav className="nav-links" aria-label="Main navigation">
           <NavLink to="/" end>
-            List
+            Index
           </NavLink>
+          <Link to="/#artists">Artists</Link>
           <NavLink to="/gallery">Gallery</NavLink>
-          <NavLink to="/sculptures/new">Add</NavLink>
-        </div>
-      </nav>
+          <NavLink to="/sculptures/new">Add work</NavLink>
+        </nav>
 
-      <main>
+        <p className="header-meta">
+          London
+          <br />
+          Vol. 01 — 2026
+        </p>
+      </header>
+
+      <main className="site-main">
         <Outlet
           context={{
             sculptures,
@@ -38,9 +55,10 @@ export default function Layout({
         />
       </main>
 
-      <footer className="footer">
-        <span>React + React Router practice</span>
-        <span>Data from AlbertProfe/sculptures</span>
+      <footer className="site-footer">
+        <p>Sculptures — an independent index of public art.</p>
+        <p>Catalogue data: AlbertProfe / React docs</p>
+        <p>React + React Router</p>
       </footer>
     </>
   )

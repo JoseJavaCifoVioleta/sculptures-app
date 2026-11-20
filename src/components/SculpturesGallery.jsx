@@ -28,9 +28,6 @@ export default function SculpturesGallery({
         <p className="eyebrow">Gallery</p>
         <h1 className="page-title">{caption}</h1>
         <div className="empty-card">
-          <span className="empty-icon" aria-hidden="true">
-            🗿
-          </span>
           <p className="page-lead">
             There are no sculptures to show. Add one from the catalogue.
           </p>
@@ -231,9 +228,7 @@ export default function SculpturesGallery({
               >
                 <img src={item.url} alt="" />
                 {itemLiked && (
-                  <span className="gallery-thumb-like" aria-hidden="true">
-                    ♥
-                  </span>
+                  <span className="gallery-thumb-like" aria-hidden="true" />
                 )}
               </button>
             )
