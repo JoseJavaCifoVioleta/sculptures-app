@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useOutletContext, useSearchParams } from 'react-router-dom'
 import ConfirmDialog from '../components/ConfirmDialog.jsx'
 import Pagination from '../components/Pagination.jsx'
+import { getWorkDetails } from '../data/editorial.js'
 
 const PAGE_SIZE = 6
 
@@ -39,10 +40,32 @@ function normalize(value) {
     .replace(/[\u0300-\u036f]/g, '')
 }
 
+function buildArtistIndex(sculptures) {
+  const byName = new Map()
+  const artists = []
+
+  sculptures.forEach((sculpture) => {
+    if (!byName.has(sculpture.artist)) {
+      const entry = {
+        name: sculpture.artist,
+        works: [],
+        principal: sculpture,
+      }
+      byName.set(sculpture.artist, entry)
+      artists.push(entry)
+    }
+
+    byName.get(sculpture.artist).works.push(sculpture)
+  })
+
+  return artists
+}
+
 export default function SculptureListPage() {
   const { sculptures, deleteSculpture, resetSculptures } = useOutletContext()
   const [searchParams, setSearchParams] = useSearchParams()
   const [pendingAction, setPendingAction] = useState(null)
+  const [previewArtist, setPreviewArtist] = useState(null)
 
   const rawField = searchParams.get('field')
   const activeField =
@@ -62,6 +85,18 @@ export default function SculptureListPage() {
         ),
       )
     : sculptures
+
+  const artists = buildArtistIndex(sculptures)
+  const previewedArtist =
+    artists.find((artist) => artist.name === previewArtist) ??
+    artists[0] ??
+    null
+
+  const featured =
+    sculptures.find((sculpture) => String(sculpture.id) === '6') ??
+    sculptures[0] ??
+    null
+  const featuredDetails = featured ? getWorkDetails(featured) : null
 
   const viewMode = searchParams.get('view') === 'pages' ? 'pages' : 'all'
   const totalPages = Math.max(
@@ -151,6 +186,21 @@ export default function SculptureListPage() {
     setSearchParams(next, { replace: true })
   }
 
+  function filterByArtist(name) {
+    const next = new URLSearchParams(searchParams)
+    next.delete('artist')
+    next.delete('page')
+    next.set('field', 'artist')
+    next.set('q', name)
+    setSearchParams(next)
+
+    window.requestAnimationFrame(() => {
+      document
+        .getElementById('collection')
+        ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    })
+  }
+
   function changeView(mode) {
     if (mode === viewMode) return
 
@@ -195,236 +245,410 @@ export default function SculptureListPage() {
   const dialogContent =
     pendingAction?.type === 'delete'
       ? {
-          icon: '🗑️',
-          title: 'Delete sculpture?',
+          title: 'Delete this work?',
           description: `“${pendingAction.sculpture.name}” by ${pendingAction.sculpture.artist} will be removed from the catalogue. This cannot be undone.`,
-          confirmLabel: 'Delete',
+          confirmLabel: 'Delete work',
         }
       : {
-          icon: '↺',
-          title: 'Restore original data?',
+          title: 'Restore the original catalogue?',
           description:
-            'This will replace the current catalogue with the original sculptures from data.js. Any additions, edits or deletions you made will be lost. This cannot be undone.',
-          confirmLabel: 'Restore data',
+            'This replaces the current catalogue with the original works from data.js. Any additions, edits or deletions will be lost. This cannot be undone.',
+          confirmLabel: 'Restore catalogue',
         }
 
   return (
-    <section className="page">
-      <p className="eyebrow">Public art catalogue</p>
-      <h1 className="page-title">Sculptures</h1>
-      <p className="page-lead">
-        A small gallery of public sculptures from around the world.
-      </p>
+    <>
+      <section className="hero">
+        <div className="hero-kicker">
+          <span>Independent sculpture index</span>
+          <span>
+            {sculptures.length} works · {artists.length} artists
+          </span>
+        </div>
 
-      <div className="stat-card">
-        <span className="stat-value">{sculptures.length}</span>
-        <span className="stat-label">sculptures in the catalogue</span>
-      </div>
+        <h1 className="hero-title">Sculptures</h1>
 
-      <div className="page-actions">
-        <Link className="button-primary" to="/sculptures/new">
-          Add a sculpture
-        </Link>
-        <button
-          className="button-ghost"
-          type="button"
-          onClick={() => setPendingAction({ type: 'restore' })}
-        >
-          Restore original data
-        </button>
-      </div>
+        <div className="hero-foot">
+          <p className="hero-intro">
+            A considered selection of public sculpture, presented as a living
+            catalogue of material, scale and place.
+          </p>
+          <a className="text-link" href="#artists">
+            Index of artists
+          </a>
+        </div>
 
-      <div className="list-toolbar">
-        <div className="filter-bar">
-          <div className="filter-fields-row">
-            <span className="form-label" id="filter-field-label">
-              Filter by
-            </span>
-            <div
-              className="filter-fields"
-              role="group"
-              aria-labelledby="filter-field-label"
+        {featured && (
+          <div className="hero-feature">
+            <Link
+              className="hero-feature-media"
+              to={`/sculptures/${featured.id}`}
+              aria-label={`View ${featured.name}`}
             >
-              {FILTER_FIELDS.map((field) => (
-                <button
-                  className="filter-field"
-                  key={field.id}
-                  type="button"
-                  aria-pressed={activeField.id === field.id}
-                  onClick={() => changeFilterField(field.id)}
-                >
-                  {field.label}
-                </button>
+              <img
+                src={featured.url}
+                alt={featured.alt ?? ''}
+                fetchPriority="high"
+              />
+            </Link>
+
+            <div className="hero-feature-caption">
+              <p className="caption-label">Featured work</p>
+              <h2>{featured.name}</h2>
+              <p>
+                {featured.artist}
+                {featured.year !== '' && featured.year != null
+                  ? ` · ${featured.year}`
+                  : ''}
+              </p>
+              <p>
+                {featuredDetails.material} · {featuredDetails.dimensions}
+              </p>
+            </div>
+          </div>
+        )}
+      </section>
+
+      <section className="artists-section" id="artists">
+        <div className="section-head">
+          <div>
+            <p className="section-label">01 — Index</p>
+            <h2 className="section-title">Artists represented</h2>
+          </div>
+          <p className="section-note">
+            Hover to preview a principal work. Select a name to filter the
+            collection.
+          </p>
+        </div>
+
+        {artists.length > 0 ? (
+          <div className="artists-layout">
+            <ul
+              className="artist-list"
+              onMouseLeave={() => setPreviewArtist(null)}
+            >
+              {artists.map((artist, index) => (
+                <li key={artist.name}>
+                  <button
+                    className={`artist-row${
+                      previewedArtist?.name === artist.name
+                        ? ' is-active'
+                        : ''
+                    }`}
+                    type="button"
+                    onMouseEnter={() => setPreviewArtist(artist.name)}
+                    onFocus={() => setPreviewArtist(artist.name)}
+                    onClick={() => filterByArtist(artist.name)}
+                  >
+                    <span className="artist-index">
+                      {String(index + 1).padStart(2, '0')}
+                    </span>
+                    <span className="artist-name">{artist.name}</span>
+                    <span className="artist-count">
+                      {String(artist.works.length).padStart(2, '0')}
+                    </span>
+                    <img
+                      className="artist-thumb"
+                      src={artist.principal.url}
+                      alt=""
+                    />
+                  </button>
+                </li>
               ))}
+            </ul>
+
+            <aside className="artist-preview" aria-live="polite">
+              {previewedArtist && (
+                <>
+                  <div className="artist-preview-media">
+                    <img
+                      key={previewedArtist.name}
+                      src={previewedArtist.principal.url}
+                      alt={previewedArtist.principal.alt ?? ''}
+                    />
+                  </div>
+                  <p className="caption-label">Principal work</p>
+                  <h3>{previewedArtist.principal.name}</h3>
+                  <p>
+                    {previewedArtist.name}
+                    {previewedArtist.principal.year !== '' &&
+                    previewedArtist.principal.year != null
+                      ? ` · ${previewedArtist.principal.year}`
+                      : ''}
+                  </p>
+                </>
+              )}
+            </aside>
+          </div>
+        ) : (
+          <div className="empty-note">
+            <h3>The index is waiting for its first artist.</h3>
+            <p>
+              Add a work to begin the catalogue, or restore the original
+              selection.
+            </p>
+            <div className="empty-actions">
+              <Link className="text-link" to="/sculptures/new">
+                Add a work
+              </Link>
+              <button
+                className="text-link"
+                type="button"
+                onClick={() => setPendingAction({ type: 'restore' })}
+              >
+                Restore catalogue
+              </button>
+            </div>
+          </div>
+        )}
+      </section>
+
+      <section className="collection" id="collection">
+        <div className="collection-head">
+          <div>
+            <p className="section-label">02 — Collection</p>
+            <h2 className="section-title">Selected works</h2>
+          </div>
+          <div className="collection-meta">
+            <p>
+              {visibleSculptures.length} of {sculptures.length}{' '}
+              {sculptures.length === 1 ? 'work' : 'works'}
+            </p>
+            <Link className="text-link" to="/sculptures/new">
+              Add a work
+            </Link>
+          </div>
+        </div>
+
+        <div className="list-toolbar">
+          <div className="filter-bar">
+            <div className="filter-fields-row">
+              <span className="form-label" id="filter-field-label">
+                Filter by
+              </span>
+              <div
+                className="filter-fields"
+                role="group"
+                aria-labelledby="filter-field-label"
+              >
+                {FILTER_FIELDS.map((field) => (
+                  <button
+                    className="filter-field"
+                    key={field.id}
+                    type="button"
+                    aria-pressed={activeField.id === field.id}
+                    onClick={() => changeFilterField(field.id)}
+                  >
+                    {field.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="filter-query-row">
+              <input
+                className="form-input"
+                id="catalogue-filter"
+                type="search"
+                value={filterQuery}
+                onChange={(event) => updateFilterQuery(event.target.value)}
+                placeholder={activeField.placeholder}
+                aria-label={`Filter by ${fieldName}`}
+                autoComplete="off"
+              />
+
+              {hasFilter && (
+                <button
+                  className="text-link"
+                  type="button"
+                  onClick={clearFilter}
+                >
+                  Clear filter
+                </button>
+              )}
             </div>
           </div>
 
-          <div className="filter-query-row">
-            <input
-              className="form-input"
-              id="catalogue-filter"
-              type="search"
-              value={filterQuery}
-              onChange={(event) => updateFilterQuery(event.target.value)}
-              placeholder={activeField.placeholder}
-              aria-label={`Filter by ${fieldName}`}
-              autoComplete="off"
-            />
+          <div className="view-switch" role="group" aria-label="Layout">
+            <button
+              className="view-option"
+              type="button"
+              aria-pressed={viewMode === 'all'}
+              onClick={() => changeView('all')}
+            >
+              All
+            </button>
+            <button
+              className="view-option"
+              type="button"
+              aria-pressed={viewMode === 'pages'}
+              onClick={() => changeView('pages')}
+            >
+              Pages
+            </button>
+          </div>
+        </div>
 
-            {hasFilter && (
+        {hasFilter && sculptures.length > 0 && (
+          <p className="filter-summary" role="status">
+            {viewMode === 'pages'
+              ? `Showing ${rangeStart}–${rangeEnd} of ${visibleSculptures.length} ${
+                  visibleSculptures.length === 1 ? 'work' : 'works'
+                } where ${fieldName} matches “${trimmedQuery}”.`
+              : `Showing ${visibleSculptures.length} of ${sculptures.length} ${
+                  sculptures.length === 1 ? 'work' : 'works'
+                } where ${fieldName} matches “${trimmedQuery}”.`}
+          </p>
+        )}
+
+        {!hasFilter && viewMode === 'pages' && sculptures.length > 0 && (
+          <p className="filter-summary" role="status">
+            Showing {rangeStart}–{rangeEnd} of {sculptures.length}{' '}
+            {sculptures.length === 1 ? 'work' : 'works'}.
+          </p>
+        )}
+
+        {sculptures.length === 0 && (
+          <div className="empty-note">
+            <h3>No works in the catalogue.</h3>
+            <p>
+              Add a first sculpture or restore the original selection to begin
+              again.
+            </p>
+            <div className="empty-actions">
+              <Link className="text-link" to="/sculptures/new">
+                Add a work
+              </Link>
               <button
-                className="button-ghost"
+                className="text-link"
+                type="button"
+                onClick={() => setPendingAction({ type: 'restore' })}
+              >
+                Restore catalogue
+              </button>
+            </div>
+          </div>
+        )}
+
+        {sculptures.length > 0 && visibleSculptures.length === 0 && (
+          <div className="empty-note">
+            <h3>No works match this search.</h3>
+            <p>
+              Nothing in the collection matches {fieldName} “{trimmedQuery}”.
+            </p>
+            <div className="empty-actions">
+              <button
+                className="text-link"
                 type="button"
                 onClick={clearFilter}
               >
                 Clear filter
               </button>
-            )}
+            </div>
           </div>
-        </div>
+        )}
 
-        <div className="view-switch" role="group" aria-label="Layout">
-          <button
-            className="view-option"
-            type="button"
-            aria-pressed={viewMode === 'all'}
-            onClick={() => changeView('all')}
-          >
-            All
-          </button>
-          <button
-            className="view-option"
-            type="button"
-            aria-pressed={viewMode === 'pages'}
-            onClick={() => changeView('pages')}
-          >
-            Pages
-          </button>
-        </div>
-      </div>
+        {showGrid && (
+          <ul className="sculpture-grid">
+            {listedSculptures.map((sculpture, index) => {
+              const details = getWorkDetails(sculpture)
 
-      {hasFilter && sculptures.length > 0 && (
-        <p className="filter-summary" role="status">
-          {viewMode === 'pages'
-            ? `Showing ${rangeStart}–${rangeEnd} of ${visibleSculptures.length} ${
-                visibleSculptures.length === 1 ? 'sculpture' : 'sculptures'
-              } where ${fieldName} matches “${trimmedQuery}”.`
-            : `Showing ${visibleSculptures.length} of ${sculptures.length} ${
-                sculptures.length === 1 ? 'sculpture' : 'sculptures'
-              } where ${fieldName} matches “${trimmedQuery}”.`}
-        </p>
-      )}
+              return (
+                <li
+                  className="sculpture-card"
+                  key={sculpture.id}
+                  style={{ '--card-index': String(index) }}
+                >
+                  <Link
+                    className="sculpture-media"
+                    to={`/sculptures/${sculpture.id}`}
+                    aria-label={`View ${sculpture.name}`}
+                  >
+                    <img
+                      src={sculpture.url}
+                      alt={sculpture.alt ?? ''}
+                      loading="lazy"
+                    />
+                  </Link>
 
-      {!hasFilter && viewMode === 'pages' && sculptures.length > 0 && (
-        <p className="filter-summary" role="status">
-          Showing {rangeStart}–{rangeEnd} of {sculptures.length}{' '}
-          {sculptures.length === 1 ? 'sculpture' : 'sculptures'}.
-        </p>
-      )}
+                  <div className="sculpture-body">
+                    <div className="sculpture-meta">
+                      <span>
+                        {sculpture.year !== '' && sculpture.year != null
+                          ? sculpture.year
+                          : 'Undated'}
+                      </span>
+                      <span>{details.material}</span>
+                    </div>
 
-      {sculptures.length === 0 && (
-        <div className="empty-card list-empty">
-          <span className="empty-icon" aria-hidden="true">
-            🗿
-          </span>
-          <p className="page-lead">
-            The catalogue is empty. Use “Add a sculpture” or “Restore original
-            data” to start again.
+                    <h3 className="sculpture-name">
+                      <Link to={`/sculptures/${sculpture.id}`}>
+                        {sculpture.name}
+                      </Link>
+                    </h3>
+                    <p className="sculpture-artist">{sculpture.artist}</p>
+
+                    <div className="work-actions">
+                      <Link to={`/sculptures/${sculpture.id}`}>
+                        View work
+                      </Link>
+                      <Link to={`/sculptures/${sculpture.id}/edit`}>
+                        Edit
+                      </Link>
+                      <button
+                        className="text-link--danger"
+                        type="button"
+                        onClick={() =>
+                          setPendingAction({ type: 'delete', sculpture })
+                        }
+                        aria-label={`Delete ${sculpture.name}`}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                </li>
+              )
+            })}
+          </ul>
+        )}
+
+        {showPagination && (
+          <Pagination
+            page={currentPage}
+            totalPages={totalPages}
+            onChange={goToPage}
+          />
+        )}
+
+        <div className="archive-tools">
+          <p>
+            {sculptures.length} {sculptures.length === 1 ? 'entry' : 'entries'}{' '}
+            in the catalogue
           </p>
-        </div>
-      )}
-
-      {sculptures.length > 0 && visibleSculptures.length === 0 && (
-        <div className="empty-card list-empty">
-          <span className="empty-icon" aria-hidden="true">
-            🔍
-          </span>
-          <p className="page-lead">
-            No sculptures where {fieldName} matches “{trimmedQuery}”.
-          </p>
-          <div className="page-actions">
+          <div className="archive-tools-actions">
+            <Link className="text-link" to="/sculptures/new">
+              Add a work
+            </Link>
             <button
-              className="button-ghost"
+              className="text-link"
               type="button"
-              onClick={clearFilter}
+              onClick={() => setPendingAction({ type: 'restore' })}
             >
-              Clear filter
+              Restore original data
             </button>
           </div>
         </div>
-      )}
 
-      {showGrid && (
-        <ul className="sculpture-grid">
-          {listedSculptures.map((sculpture, index) => (
-            <li
-              className="sculpture-card"
-              key={sculpture.id}
-              style={{ '--card-index': String(index) }}
-            >
-              <div className="sculpture-media">
-                <img
-                  src={sculpture.url}
-                  alt={sculpture.alt ?? ''}
-                  width="80"
-                  loading="lazy"
-                />
-              </div>
-
-              <div className="sculpture-body">
-                {sculpture.year !== '' && sculpture.year != null && (
-                  <p className="sculpture-year">{sculpture.year}</p>
-                )}
-                <h2 className="sculpture-name">{sculpture.name}</h2>
-                <p className="sculpture-artist">{sculpture.artist}</p>
-
-                <div className="sculpture-actions">
-                  <Link
-                    className="button-ghost"
-                    to={`/sculptures/${sculpture.id}`}
-                  >
-                    View
-                  </Link>
-                  <Link
-                    className="button-ghost"
-                    to={`/sculptures/${sculpture.id}/edit`}
-                  >
-                    Edit
-                  </Link>
-                  <button
-                    className="button-ghost button-danger"
-                    type="button"
-                    onClick={() =>
-                      setPendingAction({ type: 'delete', sculpture })
-                    }
-                    aria-label={`Delete ${sculpture.name}`}
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
-
-      {showPagination && (
-        <Pagination
-          page={currentPage}
-          totalPages={totalPages}
-          onChange={goToPage}
+        <ConfirmDialog
+          open={Boolean(pendingAction)}
+          title={dialogContent.title}
+          description={dialogContent.description}
+          confirmLabel={dialogContent.confirmLabel}
+          onConfirm={confirmPendingAction}
+          onCancel={() => setPendingAction(null)}
         />
-      )}
-
-      <ConfirmDialog
-        open={Boolean(pendingAction)}
-        icon={dialogContent.icon}
-        title={dialogContent.title}
-        description={dialogContent.description}
-        confirmLabel={dialogContent.confirmLabel}
-        onConfirm={confirmPendingAction}
-        onCancel={() => setPendingAction(null)}
-      />
-    </section>
+      </section>
+    </>
   )
 }

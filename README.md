@@ -3,7 +3,8 @@
 SPA para gestionar un catálogo de esculturas públicas. Es la resolución, paso a paso, del
 ejercicio [`React Sculptures CRUD Practice`](docs/React%20Sculptures%20CRUD%20Practice.md):
 un CRUD completo (Create, Read, Update, Delete) con navegación superior mediante
-`react-router-dom`.
+`react-router-dom` y una dirección de arte editorial inspirada en catálogos de galería
+contemporánea.
 
 ## Funcionalidades
 
@@ -18,14 +19,20 @@ un CRUD completo (Create, Read, Update, Delete) con navegación superior mediant
 - Galería en `/gallery` para recorrer el catálogo de una en una: Previous/Next con **Loop**
   opcional, miniaturas, like por escultura, año, fondos, animación y descripción
   expandible.
+- Portada editorial con titular a ancho completo, obra destacada e índice de artistas con
+  vista previa al pasar el ratón o al enfocar un nombre.
+- Ficha de museo en `/sculptures/:id` con material, medidas, estado, biografía breve del
+  artista y un enlace sutil de consulta de disponibilidad.
 - Persistencia en `localStorage` mediante el hook `useSculptures`.
-- Modo claro y oscuro automáticos según la preferencia del sistema.
+- Dirección de arte en piedra cálida, tinta y líneas de 1px, con transiciones fluidas y
+  soporte para `prefers-reduced-motion`.
 
 ## Stack
 
 - **React 19** con componentes funcionales y hooks.
 - **Vite 8** como bundler y servidor de desarrollo.
 - **react-router-dom 7** para las rutas.
+- **Google Fonts** con **Instrument Serif** para titulares y **DM Sans** para la interfaz.
 - **ESLint 10** (flat config) para el análisis estático.
 - JavaScript (sin TypeScript), tal como propone el enunciado.
 
@@ -46,6 +53,47 @@ npm run build     # build de producción
 npm run preview   # previsualizar el build
 ```
 
+## Dirección de arte
+
+El rediseño parte de una idea de catálogo impreso de lujo: una retícula amplia, líneas
+ultrafinas y una tipografía con contraste. La página se organiza como una portada de
+galería, no como un panel de administración.
+
+- **Paleta:** piedra cálida `#F5F4F0`, tinta `#141414` y líneas `#D8D6CE`. El papel de las
+  imágenes es `#FBFAF7`.
+- **Tipografía:** Instrument Serif para el titular, los títulos de obra y las biografías;
+  DM Sans para navegación, etiquetas y controles.
+- **Sin adornos:** no hay `box-shadow` ni degradados. La jerarquía sale de la escala, el
+  espacio en blanco y las divisorias de 1px.
+- **Portada:** el nombre de la galería ocupa el ancho útil, seguido de una obra destacada y
+  del índice de artistas. Al pasar el ratón o enfocar un nombre, el panel lateral muestra su
+  obra principal; al pulsarlo, se filtra la colección.
+- **Ficha de obra:** imagen de gran formato, medidas, material, estado, edición y una
+  biografía breve del artista, con el enlace «Consultar disponibilidad / Adquirir».
+- **Movimiento:** transiciones cortas de opacidad, escala y desplazamiento. Con
+  `prefers-reduced-motion` se desactivan.
+
+## Capturas del rediseño
+
+**Portada de escritorio** — el nombre de la galería ocupa todo el ancho útil, seguido de la
+obra destacada.
+
+![Portada editorial de Sculptures](docs/Rediseno_portada.jpg)
+
+**Índice de artistas** — vista previa de la obra principal al pasar el ratón por Niki de
+Saint Phalle.
+
+![Índice de artistas con vista previa de Blue Nana](docs/Rediseno_artistas.jpg)
+
+**Ficha de museo** — imagen de gran formato, descripción, material, medidas y el enlace
+«Consultar disponibilidad / Adquirir».
+
+![Ficha de la obra Ultimate Form](docs/Rediseno_ficha.jpg)
+
+**Vista móvil** — la misma jerarquía editorial en una sola columna.
+
+<img src="docs/Rediseno_movil.jpg" alt="Portada del rediseño en vista móvil" width="360" />
+
 ## Estructura del proyecto
 
 ```
@@ -61,9 +109,11 @@ sculptures-app/
 │   ├── hooks/             # useSculptures: estado, CRUD y persistencia
 │   ├── pages/             # Layout, listado, detalle, formulario, galería y 404
 │   ├── App.jsx            # router y composición de la aplicación
-│   ├── App.css            # estilos de la barra y del contenido
-│   ├── index.css          # estilos globales y variables de tema
+│   ├── App.css            # estilos de la portada, la colección y las fichas
+│   ├── index.css          # estilos globales y variables de la dirección de arte
 │   ├── data.js            # dataset de esculturas (parte 2)
+│   ├── data/
+│   │   └── editorial.js   # materiales, medidas y biografías de la ficha
 │   └── main.jsx           # punto de entrada
 ├── index.html
 ├── vite.config.js
@@ -89,6 +139,7 @@ sculptures-app/
 | Anexo | Vista paginada con conmutador                 | ✅     | [Anexo 1](docs/bitacora/anexo-01-vista-paginada.md)         |
 | Anexo | Filtro por campo seleccionable                | ✅     | [Anexo 2](docs/bitacora/anexo-02-filtro-por-campo.md)       |
 | Anexo | Galería con las diez ideas de `exercise.md`   | ✅     | [Anexo 3](docs/bitacora/anexo-03-galeria.md)                |
+| Diseño | Rediseño editorial y ficha de museo           | ✅     | [Dirección de arte](#dirección-de-arte)                     |
 
 ## Bitácora de desarrollo
 
@@ -135,3 +186,5 @@ La práctica principal, los bonus y los anexos están completos. Como mejoras op
   basados en el ejemplo de la documentación de React.
 - Enunciado de la práctica: [`docs/React Sculptures CRUD Practice.md`](docs/React%20Sculptures%20CRUD%20Practice.md).
 - Enunciado de la galería: [`docs/exercise.md`](docs/exercise.md).
+- Tipografías: [Instrument Serif](https://fonts.google.com/specimen/Instrument+Serif) y
+  [DM Sans](https://fonts.google.com/specimen/DM+Sans), servidas por Google Fonts.

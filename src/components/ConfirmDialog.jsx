@@ -2,7 +2,6 @@ import { useEffect, useId, useRef } from 'react'
 
 export default function ConfirmDialog({
   open,
-  icon = '⚠️',
   title,
   description,
   confirmLabel = 'Confirm',
@@ -56,9 +55,7 @@ export default function ConfirmDialog({
     >
       {open && (
         <div className="confirm-card">
-          <span className="confirm-icon" aria-hidden="true">
-            {icon}
-          </span>
+          <p className="section-label">Confirmation</p>
           <h2 className="confirm-title" id={titleId}>
             {title}
           </h2>
