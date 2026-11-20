@@ -73,6 +73,27 @@ galería, no como un panel de administración.
 - **Movimiento:** transiciones cortas de opacidad, escala y desplazamiento. Con
   `prefers-reduced-motion` se desactivan.
 
+## Capturas del rediseño
+
+**Portada de escritorio** — el nombre de la galería ocupa todo el ancho útil, seguido de la
+obra destacada.
+
+![Portada editorial de Sculptures](docs/Rediseno_portada.jpg)
+
+**Índice de artistas** — vista previa de la obra principal al pasar el ratón por Niki de
+Saint Phalle.
+
+![Índice de artistas con vista previa de Blue Nana](docs/Rediseno_artistas.jpg)
+
+**Ficha de museo** — imagen de gran formato, descripción, material, medidas y el enlace
+«Consultar disponibilidad / Adquirir».
+
+![Ficha de la obra Ultimate Form](docs/Rediseno_ficha.jpg)
+
+**Vista móvil** — la misma jerarquía editorial en una sola columna.
+
+<img src="docs/Rediseno_movil.jpg" alt="Portada del rediseño en vista móvil" width="360" />
+
 ## Estructura del proyecto
 
 ```
