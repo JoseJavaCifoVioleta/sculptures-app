@@ -1,16 +1,12 @@
 import { useState } from 'react'
-import {
-  Link,
-  useNavigate,
-  useOutletContext,
-  useParams,
-} from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import ConfirmDialog from '../components/ConfirmDialog.jsx'
+import { useSculptures } from '../SculpturesContext.jsx'
 import { getArtistProfile, getWorkDetails } from '../data/editorial.js'
 
 export default function SculptureDetailPage() {
   const { id } = useParams()
-  const { sculptures, deleteSculpture } = useOutletContext()
+  const { sculptures, removeSculpture } = useSculptures()
   const navigate = useNavigate()
   const [confirmOpen, setConfirmOpen] = useState(false)
 
@@ -46,10 +42,15 @@ export default function SculptureDetailPage() {
     `I would like to enquire about the availability of “${sculpture.name}” by ${sculpture.artist} (${details.dimensions}).\n\nName:\nInstitution:\nMessage:`,
   )
 
-  function handleDelete() {
-    deleteSculpture(sculpture.id)
-    setConfirmOpen(false)
-    navigate('/')
+  async function handleDelete() {
+    try {
+      await removeSculpture(sculpture.id)
+      setConfirmOpen(false)
+      navigate('/')
+    } catch {
+      setConfirmOpen(false)
+      // Layout muestra el error de la acción en el banner superior.
+    }
   }
 
   return (

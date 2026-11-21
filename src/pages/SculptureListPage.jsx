@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
-import { Link, useOutletContext, useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import ConfirmDialog from '../components/ConfirmDialog.jsx'
 import Pagination from '../components/Pagination.jsx'
+import { useSculptures } from '../SculpturesContext.jsx'
 import { getWorkDetails } from '../data/editorial.js'
 
 const PAGE_SIZE = 6
@@ -62,7 +63,7 @@ function buildArtistIndex(sculptures) {
 }
 
 export default function SculptureListPage() {
-  const { sculptures, deleteSculpture, resetSculptures } = useOutletContext()
+  const { sculptures, removeSculpture, resetSculptures } = useSculptures()
   const [searchParams, setSearchParams] = useSearchParams()
   const [pendingAction, setPendingAction] = useState(null)
   const [previewArtist, setPreviewArtist] = useState(null)
@@ -93,7 +94,7 @@ export default function SculptureListPage() {
     null
 
   const featured =
-    sculptures.find((sculpture) => String(sculpture.id) === '6') ??
+    sculptures.find((sculpture) => sculpture.name === 'Ultimate Form') ??
     sculptures[0] ??
     null
   const featuredDetails = featured ? getWorkDetails(featured) : null
@@ -230,16 +231,20 @@ export default function SculptureListPage() {
     setSearchParams(next)
   }
 
-  function confirmPendingAction() {
+  async function confirmPendingAction() {
     if (!pendingAction) return
 
-    if (pendingAction.type === 'delete') {
-      deleteSculpture(pendingAction.sculpture.id)
-    } else {
-      resetSculptures()
+    try {
+      if (pendingAction.type === 'delete') {
+        await removeSculpture(pendingAction.sculpture.id)
+      } else {
+        await resetSculptures()
+      }
+    } catch {
+      // Layout muestra el error de la acción en el banner superior.
+    } finally {
+      setPendingAction(null)
     }
-
-    setPendingAction(null)
   }
 
   const dialogContent =
@@ -252,7 +257,7 @@ export default function SculptureListPage() {
       : {
           title: 'Restore the original catalogue?',
           description:
-            'This replaces the current catalogue with the original works from data.js. Any additions, edits or deletions will be lost. This cannot be undone.',
+            'This replaces the current catalogue with the original 12 works. Any additions, edits or deletions will be lost. This cannot be undone.',
           confirmLabel: 'Restore catalogue',
         }
 

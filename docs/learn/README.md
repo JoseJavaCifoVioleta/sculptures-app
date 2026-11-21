@@ -226,11 +226,12 @@ Fuentes: [`useState`](https://react.dev/reference/react/useState),
 | `src/components/ConfirmDialog.jsx` | `<dialog>`, foco, Escape, ciclo de Tab |
 | `src/components/Pagination.jsx` | Previous/Next, números, `aria-current`, una sola página |
 | `src/components/SculpturesGallery.jsx` | índice, Loop, likes por `id`, miniaturas, descripción y fondos |
-| `src/pages/SculptureGalleryPage.jsx` | `useOutletContext` y `caption` pasado por props |
+| `src/pages/SculptureGalleryPage.jsx` | `useSculptures` y `caption` pasado por props |
 | `src/pages/SculptureListPage.jsx` | acciones pendientes, filtro por campo y paginación con `useSearchParams`, estados vacíos |
 | `src/pages/SculptureDetailPage.jsx` | detalle, borrado con confirmación y vuelta al listado |
 | `src/pages/SculptureFormPage.jsx` | validación, errores en línea, foco en el primer error |
-| `src/hooks/useSculptures.js` | estado, CRUD y persistencia |
-| `src/App.jsx` | router y composición del hook |
-| `src/pages/Layout.jsx` | barra superior, enlaces y `Outlet` con el contexto |
+| `src/SculpturesContext.jsx` | contexto, estado compartido y CRUD contra Neon |
+| `src/neon.js` | cliente de Neon Auth + Data API |
+| `src/App.jsx` | router y composición de la aplicación |
+| `src/pages/Layout.jsx` | barra superior, enlaces, estados de carga/error y `Outlet` |
 | `src/index.css` | variables de tema, incluidos los colores de peligro |

@@ -817,6 +817,29 @@
   color: var(--muted);
 }
 
+.data-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+  margin-top: 24px;
+  padding: 12px 16px;
+  border-left: 2px solid var(--danger);
+  background: var(--paper);
+}
+
+.data-banner p {
+  max-width: 70ch;
+  color: var(--danger);
+  font-size: 0.8rem;
+}
+
+.data-banner .text-link {
+  color: var(--danger);
+  white-space: nowrap;
+}
+
 /* -------------------------------------------------------------------------- */
 /* Pagination                                                                 */
 /* -------------------------------------------------------------------------- */

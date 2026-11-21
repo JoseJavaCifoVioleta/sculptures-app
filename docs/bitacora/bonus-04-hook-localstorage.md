@@ -1,5 +1,9 @@
 # Bonus 4 — `useSculptures` y persistencia en `localStorage`
 
+> **Nota histórica:** esta entrada documenta la versión del bonus con `localStorage`. La
+> aplicación actual guarda el catálogo en Neon y el contexto/hook vive en
+> `src/SculpturesContext.jsx`.
+
 ## Qué pedía el bonus
 
 Dos cosas relacionadas:

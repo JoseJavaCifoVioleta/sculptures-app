@@ -18,4 +18,18 @@ export default defineConfig([
       parserOptions: { ecmaFeatures: { jsx: true } },
     },
   },
+  {
+    // El wiki concentra el provider y el hook en un archivo; permitimos el hook.
+    files: ['src/SculpturesContext.jsx'],
+    rules: {
+      'react-refresh/only-export-components': [
+        'error',
+        {
+          allowConstantExport: true,
+          allowCompoundComponents: true,
+          allowExportNames: ['useSculptures'],
+        },
+      ],
+    },
+  },
 ])

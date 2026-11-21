@@ -1,5 +1,4 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import useSculptures from './hooks/useSculptures.js'
 import Layout from './pages/Layout.jsx'
 import SculptureListPage from './pages/SculptureListPage.jsx'
 import SculptureDetailPage from './pages/SculptureDetailPage.jsx'
@@ -9,29 +8,10 @@ import NoPage from './pages/NoPage.jsx'
 import './App.css'
 
 export default function App() {
-  const {
-    sculptures,
-    addSculpture,
-    updateSculpture,
-    deleteSculpture,
-    resetSculptures,
-  } = useSculptures()
-
   return (
     <BrowserRouter>
       <Routes>
-        <Route
-          path="/"
-          element={
-            <Layout
-              sculptures={sculptures}
-              addSculpture={addSculpture}
-              updateSculpture={updateSculpture}
-              deleteSculpture={deleteSculpture}
-              resetSculptures={resetSculptures}
-            />
-          }
-        >
+        <Route path="/" element={<Layout />}>
           <Route index element={<SculptureListPage />} />
           <Route path="gallery" element={<SculptureGalleryPage />} />
           <Route path="sculptures/:id" element={<SculptureDetailPage />} />

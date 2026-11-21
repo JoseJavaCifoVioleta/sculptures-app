@@ -23,7 +23,9 @@ contemporánea.
   vista previa al pasar el ratón o al enfocar un nombre.
 - Ficha de museo en `/sculptures/:id` con material, medidas, estado, biografía breve del
   artista y un enlace sutil de consulta de disponibilidad.
-- Persistencia en `localStorage` mediante el hook `useSculptures`.
+- Catálogo persistido en **Neon Postgres** y consumido con **Neon Data API** y
+  **Neon Auth anónimo** a través del hook `useSculptures`.
+- Estados de carga, error de conexión y error de acción con reintento desde la interfaz.
 - Dirección de arte en piedra cálida, tinta y líneas de 1px, con transiciones fluidas y
   soporte para `prefers-reduced-motion`.
 
@@ -32,16 +34,43 @@ contemporánea.
 - **React 19** con componentes funcionales y hooks.
 - **Vite 8** como bundler y servidor de desarrollo.
 - **react-router-dom 7** para las rutas.
+- **@neondatabase/neon-js 0.9** para Auth anónimo y consultas PostgREST contra Neon.
 - **Google Fonts** con **Instrument Serif** para titulares y **DM Sans** para la interfaz.
 - **ESLint 10** (flat config) para el análisis estático.
 - JavaScript (sin TypeScript), tal como propone el enunciado.
 
 ## Puesta en marcha
 
-```bash
-npm install
-npm run dev
-```
+La aplicación necesita un proyecto de Neon con Auth anónimo y Data API habilitados.
+
+1. Copia las variables de entorno de ejemplo:
+
+   ```bash
+   cp .env.example .env          # macOS / Linux
+   Copy-Item .env.example .env   # Windows PowerShell
+   ```
+
+2. Rellena en `.env` las dos URLs de tu proyecto:
+
+   ```bash
+   VITE_NEON_AUTH_URL=https://ep-xxx.neonauth.<region>.aws.neon.tech/neondb/auth
+   VITE_NEON_DATA_API_URL=https://ep-xxx.apirest.<region>.aws.neon.tech/neondb/rest/v1
+   ```
+
+   `VITE_NEON_AUTH_URL` es la URL de **Neon Auth** y `VITE_NEON_DATA_API_URL` la del
+   **Data API** (host `apirest`, ruta `/neondb/rest/v1`). No confundas esta última con el
+   endpoint JWKS de Auth (`/.well-known/jwks.json`).
+
+3. Abre el **SQL Editor** de Neon y ejecuta completo [`db/schema.sql`](db/schema.sql). El
+   script crea la tabla, los permisos del rol `anonymous`, las políticas RLS, inserta las 12
+   obras iniciales y recarga la caché de esquema de PostgREST.
+
+4. Instala y arranca:
+
+   ```bash
+   npm install
+   npm run dev
+   ```
 
 La aplicación queda disponible en `http://localhost:5173`.
 
@@ -52,6 +81,50 @@ npm run lint      # análisis estático
 npm run build     # build de producción
 npm run preview   # previsualizar el build
 ```
+
+## Backend: Neon
+
+El catálogo ya no vive en `localStorage`: la base de datos es la única fuente de verdad.
+
+- **Tabla:** `public.sculptures` con `id`, `name`, `artist`, `description`, `year`,
+  `location`, `url`, `alt`, `material`, `dimensions`, `created_at` y `updated_at`.
+  Mantiene el contrato del wiki (tabla, permisos y políticas RLS) y añade `material`,
+  `dimensions` y marcas de tiempo para la ficha editorial. `year` queda opcional para
+  admitir obras sin fecha documentada; el resto de columnas obligatorias coincide con la
+  guía.
+- **Cliente:** [`src/neon.js`](src/neon.js) crea el cliente con
+  `createClient({ auth: { url, allowAnonymous: true }, dataApi: { url } })`.
+- **Estado y CRUD:** [`src/SculpturesContext.jsx`](src/SculpturesContext.jsx) reúne las
+  cinco piezas de la guía (`unwrap`, `SculptureApiService`, `SculpturesContext`,
+  `SculpturesProvider` y `useSculptures`) y exporta solo el provider y el hook. El hook
+  expone `sculptures`, `loading`, `error`, `actionError`, `reload`, `addSculpture`,
+  `updateSculpture`, `removeSculpture` y `resetSculptures`.
+- **Consultas:** el SDK usa la sintaxis de PostgREST
+  (`.from('sculptures').select('*').order('id', { ascending: true })`,
+  `.insert(row).select()`, `.update(row).eq('id', id).select()`, `.delete().eq('id', id)`).
+- **Recarga del esquema:** tras ejecutar el SQL, `NOTIFY pgrst, 'reload schema'` hace que el
+  Data API vea la tabla sin reiniciar el proyecto.
+
+### Consumir la base desde otros programas
+
+Neon es PostgreSQL estándar, así que el catálogo no queda atado a esta SPA:
+
+- **SQL / drivers:** usa la cadena de conexión de Neon (`DATABASE_URL`) con `psql`, DBeaver,
+  Java/JDBC, Python, Node, etc.
+- **HTTP:** el Data API expone la misma tabla como REST en
+  `https://ep-xxx.apirest.<region>.aws.neon.tech/neondb/rest/v1/sculptures`. Se puede
+  consultar con `fetch`, `curl` o cualquier cliente HTTP enviando el token de Auth que
+  corresponda.
+- **Auth:** las escrituras anónimas funcionan porque el rol `anonymous` tiene permisos. Para
+  otros clientes conviene crear sus propios roles o usar `authenticated`.
+
+### Seguridad
+
+El esquema de práctica permite `SELECT`, `INSERT`, `UPDATE` y `DELETE` al rol `anonymous`
+para que el CRUD funcione sin registro. Es cómodo para aprender, pero **no es apto para
+producción**: cualquiera con la URL podría modificar el catálogo. Antes de publicar, limita
+las escrituras al rol `authenticated`, añade políticas RLS por usuario y mantén la
+configuración local fuera del repositorio (`.env` está ignorado por Git).
 
 ## Dirección de arte
 
@@ -98,6 +171,8 @@ Saint Phalle.
 
 ```
 sculptures-app/
+├── db/
+│   └── schema.sql         # tabla, permisos, RLS y datos iniciales para Neon
 ├── docs/
 │   ├── bitacora/          # diario de desarrollo, una entrada por parte o bonus
 │   ├── learn/             # material de estudio y guía de conceptos
@@ -106,15 +181,17 @@ sculptures-app/
 ├── src/
 │   ├── assets/            # imágenes del template de Vite (sin usar)
 │   ├── components/        # ConfirmDialog, Pagination y SculpturesGallery
-│   ├── hooks/             # useSculptures: estado, CRUD y persistencia
 │   ├── pages/             # Layout, listado, detalle, formulario, galería y 404
 │   ├── App.jsx            # router y composición de la aplicación
 │   ├── App.css            # estilos de la portada, la colección y las fichas
 │   ├── index.css          # estilos globales y variables de la dirección de arte
-│   ├── data.js            # dataset de esculturas (parte 2)
+│   ├── data.js            # dataset inicial de esculturas y semilla de Neon
 │   ├── data/
 │   │   └── editorial.js   # materiales, medidas y biografías de la ficha
+│   ├── neon.js            # cliente de Neon Auth + Data API
+│   ├── SculpturesContext.jsx # provider, contexto y hook (cinco piezas de la guía)
 │   └── main.jsx           # punto de entrada
+├── .env.example           # plantilla de variables de Neon
 ├── index.html
 ├── vite.config.js
 └── eslint.config.js
@@ -134,11 +211,12 @@ sculptures-app/
 | Bonus | Confirmación de borrado y restauración        | ✅     | [Bonus 1](docs/bitacora/bonus-01-confirmacion-borrado.md)   |
 | Bonus | Validación del formulario                     | ✅     | [Bonus 2](docs/bitacora/bonus-02-validacion-formulario.md)  |
 | Bonus | Filtro por artista con `useSearchParams`      | ✅     | [Bonus 3](docs/bitacora/bonus-03-filtro-artista.md)         |
-| Bonus | `useSculptures` y persistencia                | ✅     | [Bonus 4](docs/bitacora/bonus-04-hook-localstorage.md)      |
+| Bonus | `useSculptures` y persistencia local (histórico) | ✅     | [Bonus 4](docs/bitacora/bonus-04-hook-localstorage.md)      |
 | Bonus | Borrado desde el detalle                     | ✅     | [Bonus 5](docs/bitacora/bonus-05-borrado-detalle.md)        |
 | Anexo | Vista paginada con conmutador                 | ✅     | [Anexo 1](docs/bitacora/anexo-01-vista-paginada.md)         |
 | Anexo | Filtro por campo seleccionable                | ✅     | [Anexo 2](docs/bitacora/anexo-02-filtro-por-campo.md)       |
 | Anexo | Galería con las diez ideas de `exercise.md`   | ✅     | [Anexo 3](docs/bitacora/anexo-03-galeria.md)                |
+| Backend | Neon Data API + Auth anónimo                | ✅     | [Backend: Neon](#backend-neon)                              |
 | Diseño | Rediseño editorial y ficha de museo           | ✅     | [Dirección de arte](#dirección-de-arte)                     |
 
 ## Bitácora de desarrollo
@@ -178,7 +256,8 @@ La práctica principal, los bonus y los anexos están completos. Como mejoras op
 
 - Mantener el filtro, la vista y la página al crear o editar una escultura.
 - Persistir los likes de la galería si deben sobrevivir a una recarga.
-- Sustituir `localStorage` por una API real si el catálogo dejara de ser una práctica local.
+- Restringir las escrituras al rol `authenticated` y añadir edición por usuario.
+- Añadir búsqueda en servidor (`.ilike`, `.range`) cuando el catálogo crezca.
 
 ## Créditos
 

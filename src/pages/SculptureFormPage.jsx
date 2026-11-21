@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Link, useNavigate, useOutletContext, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useSculptures } from '../SculpturesContext.jsx'
 
 function emptyForm() {
   return {
@@ -74,7 +75,7 @@ export default function SculptureFormPage() {
 
 function SculptureForm({ id }) {
   const isEdit = Boolean(id)
-  const { sculptures, addSculpture, updateSculpture } = useOutletContext()
+  const { sculptures, addSculpture, updateSculpture } = useSculptures()
   const navigate = useNavigate()
 
   const sculpture = isEdit
@@ -85,6 +86,7 @@ function SculptureForm({ id }) {
     sculpture ? formFromSculpture(sculpture) : emptyForm(),
   )
   const [errors, setErrors] = useState({})
+  const [submitting, setSubmitting] = useState(false)
 
   if (isEdit && !sculpture) {
     return (
@@ -114,7 +116,7 @@ function SculptureForm({ id }) {
     })
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault()
 
     const values = {
@@ -140,19 +142,26 @@ function SculptureForm({ id }) {
     }
 
     setErrors({})
+    setSubmitting(true)
 
     const sculptureData = {
       ...values,
-      year: values.year === '' ? '' : Number(values.year),
+      year: values.year === '' ? null : Number(values.year),
     }
 
-    if (isEdit) {
-      updateSculpture(id, sculptureData)
-    } else {
-      addSculpture(sculptureData)
-    }
+    try {
+      if (isEdit) {
+        await updateSculpture(id, sculptureData)
+      } else {
+        await addSculpture(sculptureData)
+      }
 
-    navigate('/')
+      navigate('/')
+    } catch {
+      // Layout muestra el error de la acción en el banner superior.
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -167,7 +176,12 @@ function SculptureForm({ id }) {
           : 'Add a sculpture to the index. Material and dimensions are optional, but they complete the museum record.'}
       </p>
 
-      <form className="sculpture-form" onSubmit={handleSubmit} noValidate>
+      <form
+        className="sculpture-form"
+        onSubmit={handleSubmit}
+        noValidate
+        aria-busy={submitting}
+      >
         {Object.keys(errors).length > 0 && (
           <p className="form-alert" role="alert">
             Please fix the highlighted fields before saving.
@@ -339,8 +353,16 @@ function SculptureForm({ id }) {
         </div>
 
         <div className="form-actions">
-          <button className="button-primary" type="submit">
-            {isEdit ? 'Save changes' : 'Add to catalogue'}
+          <button
+            className="button-primary"
+            type="submit"
+            disabled={submitting}
+          >
+            {submitting
+              ? 'Saving…'
+              : isEdit
+                ? 'Save changes'
+                : 'Add to catalogue'}
           </button>
           <Link className="text-link" to="/">
             Cancel
