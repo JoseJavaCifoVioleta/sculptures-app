@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import ConfirmDialog from '../components/ConfirmDialog.jsx'
+import MaterialBadge from '../components/MaterialBadge.jsx'
 import Pagination from '../components/Pagination.jsx'
 import { useSculptures } from '../SculpturesContext.jsx'
 import { getWorkDetails } from '../data/editorial.js'
@@ -39,6 +40,25 @@ function normalize(value) {
     .toLocaleLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
+}
+
+// La luz sigue al cursor con dos variables CSS: sin estado de React y sin
+// montar un canvas WebGL por tarjeta.
+function trackPointer(event) {
+  const rect = event.currentTarget.getBoundingClientRect()
+  event.currentTarget.style.setProperty(
+    '--pointer-x',
+    `${event.clientX - rect.left}px`,
+  )
+  event.currentTarget.style.setProperty(
+    '--pointer-y',
+    `${event.clientY - rect.top}px`,
+  )
+}
+
+function resetPointer(event) {
+  event.currentTarget.style.removeProperty('--pointer-x')
+  event.currentTarget.style.removeProperty('--pointer-y')
 }
 
 function buildArtistIndex(sculptures) {
@@ -564,17 +584,24 @@ export default function SculptureListPage() {
                   key={sculpture.id}
                   style={{ '--card-index': String(index) }}
                 >
-                  <Link
-                    className="sculpture-media"
-                    to={`/sculptures/${sculpture.id}`}
-                    aria-label={`View ${sculpture.name}`}
+                  <div
+                    className="sculpture-visual"
+                    onPointerMove={trackPointer}
+                    onPointerLeave={resetPointer}
                   >
-                    <img
-                      src={sculpture.url}
-                      alt={sculpture.alt ?? ''}
-                      loading="lazy"
-                    />
-                  </Link>
+                    <Link
+                      className="sculpture-media"
+                      to={`/sculptures/${sculpture.id}`}
+                      aria-label={`View ${sculpture.name}`}
+                    >
+                      <img
+                        src={sculpture.url}
+                        alt={sculpture.alt ?? ''}
+                        loading="lazy"
+                      />
+                    </Link>
+                    <MaterialBadge material={details.material} />
+                  </div>
 
                   <div className="sculpture-body">
                     <div className="sculpture-meta">

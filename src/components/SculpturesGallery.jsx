@@ -1,5 +1,9 @@
-import { useState } from 'react'
+import { lazy, Suspense, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { getWorkDetails } from '../data/editorial.js'
+
+// Three.js y el visor solo se descargan cuando alguien activa la vista 3D.
+const GalleryViewer = lazy(() => import('../three/GalleryViewer.jsx'))
 
 const DESCRIPTION_LIMIT = 180
 
@@ -21,6 +25,7 @@ export default function SculpturesGallery({
   const [backgroundIndex, setBackgroundIndex] = useState(0)
   const [animate, setAnimate] = useState(false)
   const [expandedId, setExpandedId] = useState(null)
+  const [show3d, setShow3d] = useState(false)
 
   if (!sculptures || sculptures.length === 0) {
     return (
@@ -48,6 +53,7 @@ export default function SculpturesGallery({
   const isLast = safeIndex === sculptures.length - 1
   const isLiked = Boolean(likes[sculpture.id])
   const background = BACKGROUNDS[backgroundIndex]
+  const details = getWorkDetails(sculpture)
   const description = sculpture.description ?? ''
   const needsToggle = description.length > DESCRIPTION_LIMIT
   const expanded = expandedId === sculpture.id
@@ -143,6 +149,15 @@ export default function SculpturesGallery({
               Animate image
             </label>
 
+            <label className="check-control check-control--3d">
+              <input
+                type="checkbox"
+                checked={show3d}
+                onChange={(event) => setShow3d(event.target.checked)}
+              />
+              3D view
+            </label>
+
             <button
               className="button-ghost"
               type="button"
@@ -154,23 +169,45 @@ export default function SculpturesGallery({
         </div>
 
         <div className="gallery-stage">
-          <div className="gallery-media">
-            <img
-              key={sculpture.id}
-              className={
-                animate
-                  ? 'gallery-image gallery-image--animated'
-                  : 'gallery-image'
-              }
-              src={sculpture.url}
-              alt={sculpture.alt ?? ''}
-            />
+          <div
+            className={`gallery-media${show3d ? ' gallery-media--3d' : ''}`}
+          >
+            {show3d ? (
+              <Suspense
+                fallback={
+                  <p className="gallery-3d-fallback">
+                    Preparing the 3D material study…
+                  </p>
+                }
+              >
+                <GalleryViewer
+                  sculpture={sculpture}
+                  material={details.material}
+                  dimensions={details.dimensions}
+                />
+              </Suspense>
+            ) : (
+              <img
+                key={sculpture.id}
+                className={
+                  animate
+                    ? 'gallery-image gallery-image--animated'
+                    : 'gallery-image'
+                }
+                src={sculpture.url}
+                alt={sculpture.alt ?? ''}
+              />
+            )}
           </div>
 
           <div className="gallery-info">
             {sculpture.year !== '' && sculpture.year != null && (
               <p className="gallery-year">{sculpture.year}</p>
             )}
+
+            <p className="gallery-material">
+              {details.material} · {details.dimensions}
+            </p>
 
             <h2 className="gallery-title">
               <i>{sculpture.name}</i> by {sculpture.artist}

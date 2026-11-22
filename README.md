@@ -18,7 +18,11 @@ contemporánea.
   (`/?view=pages&page=2`).
 - Galería en `/gallery` para recorrer el catálogo de una en una: Previous/Next con **Loop**
   opcional, miniaturas, like por escultura, año, fondos, animación y descripción
-  expandible.
+  expandible. El interruptor **3D view** abre un estudio interactivo de la obra con
+  React Three Fiber, materiales procedurales según el campo `material` y proporciones
+  derivadas de `dimensions`.
+- Hover editorial en las tarjetas del catálogo: una luz suave sigue al cursor sobre la
+  imagen y un chip muestra el material de la obra, sin cargar un canvas por tarjeta.
 - Portada editorial con titular a ancho completo, obra destacada e índice de artistas con
   vista previa al pasar el ratón o al enfocar un nombre.
 - Ficha de museo en `/sculptures/:id` con material, medidas, estado, biografía breve del
@@ -35,6 +39,8 @@ contemporánea.
 - **Vite 8** como bundler y servidor de desarrollo.
 - **react-router-dom 7** para las rutas.
 - **@neondatabase/neon-js 0.9** para Auth anónimo y consultas PostgREST contra Neon.
+- **Three.js**, **@react-three/fiber** y **@react-three/drei** para el visor 3D bajo
+  demanda de la galería.
 - **Google Fonts** con **Instrument Serif** para titulares y **DM Sans** para la interfaz.
 - **ESLint 10** (flat config) para el análisis estático.
 - JavaScript (sin TypeScript), tal como propone el enunciado.
@@ -126,6 +132,53 @@ producción**: cualquiera con la URL podría modificar el catálogo. Antes de pu
 las escrituras al rol `authenticated`, añade políticas RLS por usuario y mantén la
 configuración local fuera del repositorio (`.env` está ignorado por Git).
 
+## Galería 3D y materiales
+
+La vista `/gallery` conserva la fotografía como vista principal. Al activar **3D view**, el
+panel de imagen se sustituye por un estudio interactivo de la obra. El visor y Three.js se
+cargan con `import()` dinámico: quien nunca activa el interruptor no descarga ese chunk.
+
+### Material procedural
+
+[`src/three/SculptureMaterial.jsx`](src/three/SculptureMaterial.jsx) traduce el campo
+`material` de cada obra a un `MeshPhysicalMaterial`. Las texturas se generan en canvas de
+256 px y se comparten entre obras:
+
+| Contiene | Familia | Acabado |
+| --- | --- | --- |
+| `bronze`, `brass`, `copper`, `patina` | Bronce | Metal oscuro con pátina verde y rugosidad irregular. |
+| `steel`, `aluminium`, `chrome`, `metal` | Metal pulido | Espejo (`metalness: 1`, `roughness: 0.08`) con reflejos del entorno. |
+| `basalt`, `stone`, `granite`, `marble`, `volcanic` | Piedra | Mate, poroso y gris volcánico (`roughness: 0.94`). |
+| Cualquier otro valor | Travertino / yeso | Crema cálido con vetas suaves y bump ligero. |
+
+`Polyester` y los materiales mixtos caen en la familia de travertino/yeso para no inventar
+una apariencia que el dato no describe.
+
+### Geometría, escala e iluminación
+
+- La forma es paramétrica y estable por obra (hash de `id` + `name`): bronce con nudo
+  toroidal, metal con flor de pétalos reflejantes, piedra con monolito facetado y yeso con
+  volúmenes apilados.
+- [`src/three/dimensions.js`](src/three/dimensions.js) extrae los números de
+  `420 × 310 × 280 cm` y normaliza la altura de la escena. El ancho y la profundidad
+  conservan la proporción real de la pieza, y el plinto se ajusta a esa huella.
+- La escena usa fondo transparente (`alpha: true`) sobre el `#f4f3ef` de la web,
+  `Environment` con `Lightformer` (claraboya y paredes de estudio), sombras de contacto y
+  `OrbitControls` sin paneo, con amortiguación, distancia limitada y ángulos restringidos.
+- El canvas se monta solo cuando el interruptor está activo. Las tarjetas del catálogo usan
+  un chip CSS y una luz radial que sigue al cursor, no 13 canvas WebGL simultáneos.
+
+### Controles
+
+| Acción | Gesto |
+| --- | --- |
+| Girar la pieza | Arrastrar o deslizar. |
+| Acercar / alejar | Rueda del ratón o pinza. |
+| Volver a la fotografía | Desactivar **3D view**. |
+
+Si el navegador no puede crear el contexto WebGL, el panel muestra un aviso y la fotografía
+sigue disponible al desactivar el interruptor.
+
 ## Dirección de arte
 
 El rediseño parte de una idea de catálogo impreso de lujo: una retícula amplia, líneas
@@ -180,8 +233,9 @@ sculptures-app/
 ├── public/                # favicon e iconos estáticos
 ├── src/
 │   ├── assets/            # imágenes del template de Vite (sin usar)
-│   ├── components/        # ConfirmDialog, Pagination y SculpturesGallery
+│   ├── components/        # ConfirmDialog, MaterialBadge, Pagination y SculpturesGallery
 │   ├── pages/             # Layout, listado, detalle, formulario, galería y 404
+│   ├── three/             # visor R3F, materiales, texturas y proporciones
 │   ├── App.jsx            # router y composición de la aplicación
 │   ├── App.css            # estilos de la portada, la colección y las fichas
 │   ├── index.css          # estilos globales y variables de la dirección de arte
@@ -216,6 +270,7 @@ sculptures-app/
 | Anexo | Vista paginada con conmutador                 | ✅     | [Anexo 1](docs/bitacora/anexo-01-vista-paginada.md)         |
 | Anexo | Filtro por campo seleccionable                | ✅     | [Anexo 2](docs/bitacora/anexo-02-filtro-por-campo.md)       |
 | Anexo | Galería con las diez ideas de `exercise.md`   | ✅     | [Anexo 3](docs/bitacora/anexo-03-galeria.md)                |
+| Anexo | Visor 3D y materiales procedurales             | ✅     | [Anexo 4](docs/bitacora/anexo-04-visor-3d.md)               |
 | Backend | Neon Data API + Auth anónimo                | ✅     | [Backend: Neon](#backend-neon)                              |
 | Diseño | Rediseño editorial y ficha de museo           | ✅     | [Dirección de arte](#dirección-de-arte)                     |
 
@@ -239,6 +294,7 @@ los cambios realizados:
 - [Anexo 1 — Vista paginada con conmutador](docs/bitacora/anexo-01-vista-paginada.md)
 - [Anexo 2 — Filtro por campo seleccionable](docs/bitacora/anexo-02-filtro-por-campo.md)
 - [Anexo 3 — Galería con las diez ideas](docs/bitacora/anexo-03-galeria.md)
+- [Anexo 4 — Visor 3D de la galería](docs/bitacora/anexo-04-visor-3d.md)
 
 ## Material de estudio
 

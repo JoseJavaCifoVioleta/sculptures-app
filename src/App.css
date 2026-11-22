@@ -646,6 +646,130 @@
   transform: scale(1.02);
 }
 
+.sculpture-visual {
+  position: relative;
+  isolation: isolate;
+}
+
+.sculpture-visual::after {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: radial-gradient(
+    190px circle at var(--pointer-x, 50%) var(--pointer-y, 38%),
+    rgba(255, 249, 232, 0.7),
+    rgba(255, 255, 255, 0.12) 38%,
+    transparent 68%
+  );
+  mix-blend-mode: soft-light;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  content: '';
+}
+
+@media (hover: hover) {
+  .sculpture-visual:hover::after,
+  .sculpture-visual:focus-within::after {
+    opacity: 1;
+  }
+}
+
+.material-chip {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  max-width: calc(100% - 20px);
+  padding: 6px 9px 6px 7px;
+  border: 1px solid rgba(20, 20, 20, 0.16);
+  border-radius: 999px;
+  background: rgba(251, 250, 247, 0.82);
+  box-shadow: 0 6px 18px rgba(20, 20, 20, 0.08);
+  color: var(--ink);
+  font-size: 0.56rem;
+  font-weight: 500;
+  letter-spacing: 0.09em;
+  line-height: 1;
+  text-transform: uppercase;
+  backdrop-filter: blur(8px);
+  transition:
+    transform 0.3s ease,
+    background 0.3s ease;
+}
+
+.sculpture-visual:hover .material-chip,
+.sculpture-visual:focus-within .material-chip {
+  transform: translateY(-2px);
+  background: rgba(251, 250, 247, 0.94);
+}
+
+.material-chip__orb {
+  flex: none;
+  width: 15px;
+  height: 15px;
+  border: 1px solid rgba(20, 20, 20, 0.18);
+  border-radius: 50%;
+  background:
+    radial-gradient(
+      circle at 30% 24%,
+      rgba(255, 255, 255, 0.85),
+      transparent 34%
+    ),
+    radial-gradient(circle at 62% 72%, var(--swatch-a), var(--swatch-b) 78%);
+  box-shadow: inset -2px -2px 4px rgba(0, 0, 0, 0.22);
+}
+
+.material-chip--bronze .material-chip__orb {
+  background:
+    radial-gradient(
+      circle at 30% 24%,
+      rgba(255, 255, 255, 0.35),
+      transparent 30%
+    ),
+    conic-gradient(
+      from 210deg,
+      #5f8268,
+      #443125 34%,
+      #73523a 58%,
+      #6d8a72 78%,
+      #5f8268
+    );
+}
+
+.material-chip--steel .material-chip__orb {
+  background:
+    linear-gradient(145deg, #ffffff 12%, #8e989d 38%, #f7fbfc 55%, #6f787d 82%),
+    #cfd6d9;
+  box-shadow:
+    inset -2px -2px 4px rgba(0, 0, 0, 0.18),
+    0 0 8px rgba(255, 255, 255, 0.6);
+}
+
+.material-chip--stone .material-chip__orb {
+  background:
+    radial-gradient(circle at 34% 28%, #8c8a81 0 8%, transparent 24%),
+    radial-gradient(circle at 68% 68%, #252623 0 6%, transparent 20%),
+    #494a46;
+  box-shadow: inset -2px -2px 4px rgba(0, 0, 0, 0.38);
+}
+
+.material-chip--plaster .material-chip__orb {
+  background:
+    linear-gradient(155deg, #f2ecdf 8%, #cdbfa5 44%, #eee6d6 68%, #bcae95),
+    #d8cdb8;
+  box-shadow: inset -2px -2px 4px rgba(86, 65, 40, 0.16);
+}
+
+.material-chip__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .sculpture-body {
   padding-top: 12px;
 }
@@ -1240,6 +1364,14 @@
   accent-color: var(--ink);
 }
 
+.check-control--3d input {
+  accent-color: #4f6858;
+}
+
+.check-control--3d:has(input:checked) {
+  color: var(--ink);
+}
+
 .gallery-stage {
   display: grid;
   grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
@@ -1252,6 +1384,82 @@
   overflow: hidden;
   border: 1px solid var(--line);
   background: var(--paper);
+}
+
+.gallery-media--3d {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  background:
+    radial-gradient(circle at 50% 22%, #fdfcf8 0, #f3f1ea 46%, #e8e4d9 100%);
+}
+
+.gallery-3d {
+  position: absolute;
+  inset: 0;
+  animation: gallery-in 0.7s ease;
+}
+
+.gallery-3d canvas {
+  display: block;
+  touch-action: none;
+}
+
+.gallery-3d-spec {
+  position: absolute;
+  top: 15px;
+  left: 17px;
+  display: grid;
+  gap: 4px;
+  max-width: calc(100% - 34px);
+  padding: 7px 9px;
+  border: 1px solid rgba(20, 20, 20, 0.08);
+  border-radius: 4px;
+  background: rgba(251, 250, 247, 0.76);
+  pointer-events: none;
+  backdrop-filter: blur(7px);
+}
+
+.gallery-3d-spec span:first-child {
+  color: var(--muted);
+  font-size: 0.54rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.gallery-3d-spec span:last-child {
+  font-family: var(--serif);
+  font-size: 1rem;
+  letter-spacing: -0.01em;
+}
+
+.gallery-3d-hint {
+  position: absolute;
+  bottom: 12px;
+  left: 17px;
+  padding: 5px 8px;
+  border: 1px solid rgba(20, 20, 20, 0.1);
+  border-radius: 999px;
+  background: rgba(251, 250, 247, 0.66);
+  color: var(--muted);
+  font-size: 0.52rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  pointer-events: none;
+  backdrop-filter: blur(6px);
+}
+
+.gallery-3d-fallback {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 28px;
+  color: var(--muted);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  line-height: 1.7;
+  text-align: center;
+  text-transform: uppercase;
 }
 
 .gallery-media .gallery-image {
@@ -1269,6 +1477,15 @@
   color: var(--muted);
   font-size: 0.6rem;
   letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.gallery-material {
+  margin-bottom: 12px;
+  color: var(--muted);
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  line-height: 1.6;
   text-transform: uppercase;
 }
 
@@ -1508,7 +1725,44 @@
     height: 58px;
   }
 
+  .gallery-media--3d {
+    aspect-ratio: 1 / 1;
+  }
+
+  .gallery-3d-spec {
+    top: 11px;
+    left: 12px;
+    padding: 5px 7px;
+  }
+
+  .gallery-3d-spec span:first-child {
+    display: none;
+  }
+
+  .gallery-3d-spec span:last-child {
+    font-size: 0.82rem;
+  }
+
+  .gallery-3d-hint {
+    bottom: 10px;
+    left: 12px;
+    font-size: 0.48rem;
+  }
+
   .site-footer {
     flex-direction: column;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sculpture-visual::after,
+  .material-chip,
+  .gallery-3d {
+    animation: none;
+    transition: none;
+  }
+
+  .sculpture-card:hover .sculpture-media img {
+    transform: none;
   }
 }

@@ -225,8 +225,12 @@ Fuentes: [`useState`](https://react.dev/reference/react/useState),
 | --- | --- |
 | `src/components/ConfirmDialog.jsx` | `<dialog>`, foco, Escape, ciclo de Tab |
 | `src/components/Pagination.jsx` | Previous/Next, números, `aria-current`, una sola página |
-| `src/components/SculpturesGallery.jsx` | índice, Loop, likes por `id`, miniaturas, descripción y fondos |
+| `src/components/SculpturesGallery.jsx` | índice, Loop, likes, toggle 3D, visor bajo demanda y fondos |
 | `src/pages/SculptureGalleryPage.jsx` | `useSculptures` y `caption` pasado por props |
+| `src/components/MaterialBadge.jsx` | chip de material y luz que sigue al cursor |
+| `src/three/GalleryViewer.jsx` | Canvas, `Environment`, `ContactShadows` y `OrbitControls` |
+| `src/three/ParametricSculpture.jsx` | formas paramétricas por familia de material |
+| `src/three/SculptureMaterial.jsx` | `MeshPhysicalMaterial` procedural |
 | `src/pages/SculptureListPage.jsx` | acciones pendientes, filtro por campo y paginación con `useSearchParams`, estados vacíos |
 | `src/pages/SculptureDetailPage.jsx` | detalle, borrado con confirmación y vuelta al listado |
 | `src/pages/SculptureFormPage.jsx` | validación, errores en línea, foco en el primer error |
